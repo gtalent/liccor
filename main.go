@@ -22,16 +22,16 @@ func main() {
 	licenseData = licenseData[0:len(licenseData) - 1]
 	lics := make(map[string]string)
 	lics["c-like"] = "/*\n * " + strings.Replace(string(licenseData), "\n", "\n * ", -1) + "\n */\n"
-	lics["go"] = "/*\n * " + strings.Replace(string(licenseData), "\n", "\n   ", -1) + "\n */\n"
+	lics["go"] = "/*\n   " + strings.Replace(string(licenseData), "\n", "\n   ", -1) + "\n */\n"
 	for i := 1; i < flag.NArg(); i++ {
 		fmt.Print("Correcting ", flag.Arg(i), "...")
 		pt := strings.LastIndex(flag.Arg(i), ".")
 		lic := ""
 		//determine how to format the license
 		switch flag.Arg(i)[pt:] {
-		case "go":
+		case ".go":
 			lic = lics["go"]
-		case "c", "cpp", "cxx", "h", "hpp", "java":
+		case ".c", ".cpp", ".cxx", ".h", ".hpp", ".java":
 			lic = lics["c-like"]
 		}
 		if !correct(flag.Arg(i), lic) {
