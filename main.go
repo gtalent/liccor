@@ -22,7 +22,11 @@ func main() {
 	licenseData = licenseData[0:len(licenseData) - 1]
 	lics := make(map[string]string)
 	lics["c-like"] = "/*\n * " + strings.Replace(string(licenseData), "\n", "\n * ", -1) + "\n */\n"
-	lics["go"] = "/*\n   " + strings.Replace(string(licenseData), "\n", "\n   ", -1) + "\n */\n"
+	lics["go"] = func () string {
+		golic := "/*\n   " + strings.Replace(string(licenseData), "\n", "\n   ", -1) + "\n */\n"
+		golic = strings.Replace(golic, "\n   \n", "\n\n", -1)
+		return golic
+	}()
 	for i := 1; i < flag.NArg(); i++ {
 		fmt.Print("Correcting ", flag.Arg(i), "...")
 		pt := strings.LastIndex(flag.Arg(i), ".")
