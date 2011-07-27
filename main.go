@@ -28,15 +28,23 @@ func main() {
 		return golic
 	}()
 	for i := 1; i < flag.NArg(); i++ {
-		fmt.Print("Correcting ", flag.Arg(i), "...")
 		pt := strings.LastIndex(flag.Arg(i), ".")
 		lic := ""
 		//determine how to format the license
+		if pt == -1 {
+			fmt.Println("Skipping", flag.Arg(i))
+			continue
+		}
 		switch flag.Arg(i)[pt:] {
 		case ".go":
+			fmt.Print("Correcting ", flag.Arg(i), "...")
 			lic = lics["go"]
 		case ".c", ".cpp", ".cxx", ".h", ".hpp", ".java":
+			fmt.Print("Correcting ", flag.Arg(i), "...")
 			lic = lics["c-like"]
+		default:
+			fmt.Println("Skipping", flag.Arg(i))
+			continue
 		}
 		if !correct(flag.Arg(i), lic) {
 			fmt.Println("\tFailure!")
