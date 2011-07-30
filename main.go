@@ -23,7 +23,7 @@ func main() {
 	lics := make(map[string]string)
 	lics["c-like"] = "/*\n * " + strings.Replace(string(licenseData), "\n", "\n * ", -1) + "\n */\n"
 	lics["go"] = func () string {
-		golic := "/*\n   " + strings.Replace(string(licenseData), "\n", "\n   ", -1) + "\n */\n"
+		golic := "/*\n   " + strings.Replace(string(licenseData), "\n", "\n   ", -1) + "\n*/\n"
 		golic = strings.Replace(golic, "\n   \n", "\n\n", -1)
 		return golic
 	}()
