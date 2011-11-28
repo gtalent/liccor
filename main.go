@@ -19,27 +19,42 @@ import (
 	"io/ioutil"
 	"flag"
 	"fmt"
+	"os"
 	"strings"
 )
+
+func findLicense(dir string) (string, os.Error) {
+	d, err := ioutil.ReadDir(dir)
+	if err != nil {
+		return "", err
+	}
+	for _, v := range d {
+		if v.Name == ".copyright" {
+			licenseData, err := ioutil.ReadFile(v.Name)
+			return string(licenseData), err
+		}
+	}
+	return findLicense(dir+"./.")
+}
 
 func main() {
 	flag.Parse()
 	if flag.NArg() == 0 {
 		return
 	}
-	licenseData, err := ioutil.ReadFile(flag.Arg(0))
+	licenseData, err := findLicense(".")
 	if err != nil {
 		return
 	}
 	licenseData = licenseData[0:len(licenseData) - 1]
 	lics := make(map[string]string)
 	lics["c-like"] = "/*\n * " + strings.Replace(string(licenseData), "\n", "\n * ", -1) + "\n */\n"
-	lics["go"] = func () string {
+	lics["go"] = func() string {
 		golic := "/*\n   " + strings.Replace(string(licenseData), "\n", "\n   ", -1) + "\n*/\n"
 		golic = strings.Replace(golic, "\n   \n", "\n\n", -1)
 		return golic
 	}()
-	for i := 1; i < flag.NArg(); i++ {
+	for i := 0; i < flag.NArg(); i++ {
 		pt := strings.LastIndex(flag.Arg(i), ".")
 		lic := ""
 		//determine how to format the license
