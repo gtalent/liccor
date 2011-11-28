@@ -29,7 +29,7 @@ func findLicense(dir string) (string, os.Error) {
 	}
 	for _, v := range d {
 		if v.Name == ".copyright" {
-			licenseData, err := ioutil.ReadFile(v.Name)
+			licenseData, err := ioutil.ReadFile(dir + "/" + v.Name)
 			return string(licenseData), err
 		}
 	}
@@ -59,7 +59,7 @@ func findSrcFiles(dir string) ([]string, os.Error) {
 			}
 			switch v.Name[pt:] {
 			case ".go", ".c", ".cpp", ".cxx", ".h", ".hpp", ".java":
-				output = append(output, v.Name)
+				output = append(output, dir + "/" + v.Name)
 			}
 		}
 	}
