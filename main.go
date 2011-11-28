@@ -17,7 +17,6 @@ package main
 
 import (
 	"io/ioutil"
-	"flag"
 	"fmt"
 	"os"
 	"strings"
@@ -34,19 +33,45 @@ func findLicense(dir string) (string, os.Error) {
 			return string(licenseData), err
 		}
 	}
-	return findLicense(dir+"./.")
+	return findLicense(dir + "./.")
+}
+
+func findSrcFiles(dir string) ([]string, os.Error) {
+	l, err := ioutil.ReadDir(dir)
+	if err != nil {
+		return nil, err
+	}
+	output := make([]string, 0)
+	for _, v := range l {
+		if v.IsDirectory() {
+			files, err := findSrcFiles(dir + "/" + v.Name)
+			if err != nil {
+				return output, err
+			}
+			for _, v2 := range files {
+				output = append(output, v2)
+			}
+		} else {
+			pt := strings.LastIndex(v.Name, ".")
+			//determine how to format the license
+			if pt == -1 {
+				continue
+			}
+			switch v.Name[pt:] {
+			case ".go", ".c", ".cpp", ".cxx", ".h", ".hpp", ".java":
+				output = append(output, v.Name)
+			}
+		}
+	}
+	return output, err
 }
 
 func main() {
-	flag.Parse()
-	if flag.NArg() == 0 {
-		return
-	}
 	licenseData, err := findLicense(".")
 	if err != nil {
 		return
 	}
-	licenseData = licenseData[0:len(licenseData) - 1]
+	licenseData = licenseData[0 : len(licenseData)-1]
 	lics := make(map[string]string)
 	lics["c-like"] = "/*\n * " + strings.Replace(string(licenseData), "\n", "\n * ", -1) + "\n */\n"
 	lics["go"] = func() string {
@@ -54,26 +79,26 @@ func main() {
 		golic = strings.Replace(golic, "\n   \n", "\n\n", -1)
 		return golic
 	}()
-	for i := 0; i < flag.NArg(); i++ {
-		pt := strings.LastIndex(flag.Arg(i), ".")
+	files, err := findSrcFiles(".")
+	if err != nil {
+		return
+	}
+	for i := 0; i < len(files); i++ {
+		pt := strings.LastIndex(files[i], ".")
 		lic := ""
 		//determine how to format the license
-		if pt == -1 {
-			fmt.Println("Skipping", flag.Arg(i))
-			continue
-		}
-		switch flag.Arg(i)[pt:] {
+		switch files[i][pt:] {
 		case ".go":
-			fmt.Print("Correcting ", flag.Arg(i), "...")
+			fmt.Print("Correcting ", files[i], "...")
 			lic = lics["go"]
 		case ".c", ".cpp", ".cxx", ".h", ".hpp", ".java":
-			fmt.Print("Correcting ", flag.Arg(i), "...")
+			fmt.Print("Correcting ", files[i], "...")
 			lic = lics["c-like"]
 		default:
-			fmt.Println("Skipping", flag.Arg(i))
+			fmt.Println("Skipping", files[i])
 			continue
 		}
-		if !correct(flag.Arg(i), lic) {
+		if !correct(files[i], lic) {
 			fmt.Println("\tFailure!")
 			continue
 		}
@@ -106,7 +131,7 @@ func correct(path, license string) bool {
 	if hasLicense, licenseStart := hasLicense(file); hasLicense {
 		//remove old license
 		for i := licenseStart; i < len(file); i++ {
-			if file [i] == '*' && file[i + 1] == '/' {
+			if file[i] == '*' && file[i+1] == '/' {
 				i += 2
 				if file[i] == '\n' {
 					i += 1
