@@ -59,7 +59,7 @@ func findSrcFiles(dir string) ([]string, os.Error) {
 			}
 			switch v.Name[pt:] {
 			case ".go", ".c", ".cpp", ".cxx", ".h", ".hpp", ".java":
-				output = append(output, dir + "/" + v.Name)
+				output = append(output, dir+"/"+v.Name)
 			}
 		}
 	}
@@ -89,24 +89,23 @@ func main() {
 		//determine how to format the license
 		switch files[i][pt:] {
 		case ".go":
-			fmt.Print("Correcting ", files[i], "...")
 			lic = lics["go"]
 		case ".c", ".cpp", ".cxx", ".h", ".hpp", ".java":
 			fmt.Print("Correcting ", files[i], "...")
 			lic = lics["c-like"]
-		default:
-			fmt.Println("Skipping", files[i])
-			continue
 		}
-		if !correct(files[i], lic) {
-			fmt.Println("\tFailure!")
-			continue
+		changed, err := correct(files[i], lic)
+		if changed {
+			if err != nil {
+				fmt.Println("Correcting", files[i][2:] + "...\tFailure!")
+			} else {
+				fmt.Println("Correcting", files[i][2:] + "...\tSuccess!")
+			}
 		}
-		fmt.Println("\tSuccess!")
 	}
 }
 
-func hasLicense(file []byte) (bool, int) {
+func hasLicense(file string) (bool, int) {
 	for i, c := range file {
 		switch c {
 		case ' ', '\t', '\n':
@@ -123,11 +122,13 @@ func hasLicense(file []byte) (bool, int) {
 	return false, -1
 }
 
-func correct(path, license string) bool {
-	file, err := ioutil.ReadFile(path)
+func correct(path, license string) (bool, os.Error) {
+	input, err := ioutil.ReadFile(path)
 	if err != nil {
-		return false
+		return false, err
 	}
+	file := string(input)
+	orig := file
 	if hasLicense, licenseStart := hasLicense(file); hasLicense {
 		//remove old license
 		for i := licenseStart; i < len(file); i++ {
@@ -141,6 +142,6 @@ func correct(path, license string) bool {
 			}
 		}
 	}
-	file = []byte(license + string(file))
-	return ioutil.WriteFile(path, file, 0) == nil
+	output := []byte(license + string(file))
+	return orig == file, ioutil.WriteFile(path, output, 0)
 }
