@@ -97,9 +97,9 @@ func main() {
 		changed, err := correct(files[i], lic)
 		if changed {
 			if err != nil {
-				fmt.Println("Correcting", files[i][2:] + "...\tFailure!")
+				fmt.Println("Correcting", files[i][2:]+"...\tFailure!")
 			} else {
-				fmt.Println("Correcting", files[i][2:] + "...\tSuccess!")
+				fmt.Println("Correcting", files[i][2:]+"...\tSuccess!")
 			}
 		}
 	}
@@ -142,6 +142,11 @@ func correct(path, license string) (bool, os.Error) {
 			}
 		}
 	}
-	output := []byte(license + string(file))
-	return orig == file, ioutil.WriteFile(path, output, 0)
+	file = license + file
+	output := []byte(file)
+	if file != orig {
+		err = ioutil.WriteFile(path, output, 0)
+		return true, err
+	}
+	return false, nil
 }
