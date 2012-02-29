@@ -28,11 +28,15 @@ func findLicense(dir string) (string, os.Error) {
 		return "", err
 	}
 	for _, v := range d {
-		if v.Name == ".copyright" {
+		if v.Name == ".liccor" || v.Name == ".copyright" {
 			licenseData, err := ioutil.ReadFile(dir + "/" + v.Name)
 			return string(licenseData), err
 		}
 	}
+
+	//in the event that it finds no license in the higher level
+	//directory, the program conveniently and silently crashes
+	//from a stack overflow
 	return findLicense(dir + "./.")
 }
 
