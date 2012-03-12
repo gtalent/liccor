@@ -16,20 +16,19 @@
 package main
 
 import (
-	"io/ioutil"
 	"fmt"
-	"os"
+	"io/ioutil"
 	"strings"
 )
 
-func findLicense(dir string) (string, os.Error) {
+func findLicense(dir string) (string, error) {
 	d, err := ioutil.ReadDir(dir)
 	if err != nil {
 		return "", err
 	}
 	for _, v := range d {
-		if v.Name == ".liccor" || v.Name == ".copyright" {
-			licenseData, err := ioutil.ReadFile(dir + "/" + v.Name)
+		if v.Name() == ".liccor" || v.Name() == ".copyright" {
+			licenseData, err := ioutil.ReadFile(dir + "/" + v.Name())
 			return string(licenseData), err
 		}
 	}
@@ -40,15 +39,15 @@ func findLicense(dir string) (string, os.Error) {
 	return findLicense(dir + "./.")
 }
 
-func findSrcFiles(dir string) ([]string, os.Error) {
+func findSrcFiles(dir string) ([]string, error) {
 	l, err := ioutil.ReadDir(dir)
 	if err != nil {
 		return nil, err
 	}
 	output := make([]string, 0)
 	for _, v := range l {
-		if v.IsDirectory() {
-			files, err := findSrcFiles(dir + "/" + v.Name)
+		if v.IsDir() {
+			files, err := findSrcFiles(dir + "/" + v.Name())
 			if err != nil {
 				return output, err
 			}
@@ -56,14 +55,14 @@ func findSrcFiles(dir string) ([]string, os.Error) {
 				output = append(output, v2)
 			}
 		} else {
-			pt := strings.LastIndex(v.Name, ".")
+			pt := strings.LastIndex(v.Name(), ".")
 			//determine how to format the license
 			if pt == -1 {
 				continue
 			}
-			switch v.Name[pt:] {
+			switch v.Name()[pt:] {
 			case ".go", ".c", ".cpp", ".cxx", ".h", ".hpp", ".java":
-				output = append(output, dir+"/"+v.Name)
+				output = append(output, dir+"/"+v.Name())
 			}
 		}
 	}
@@ -126,7 +125,7 @@ func hasLicense(file string) (bool, int) {
 	return false, -1
 }
 
-func correct(path, license string) (bool, os.Error) {
+func correct(path, license string) (bool, error) {
 	input, err := ioutil.ReadFile(path)
 	if err != nil {
 		return false, err
