@@ -56,7 +56,6 @@ func findSrcFiles(dir string) ([]string, error) {
 			}
 		} else {
 			pt := strings.LastIndex(v.Name(), ".")
-			//determine how to format the license
 			if pt == -1 {
 				continue
 			}
@@ -94,7 +93,6 @@ func main() {
 		case ".go":
 			lic = lics["go"]
 		case ".c", ".cpp", ".cxx", ".h", ".hpp", ".java":
-			fmt.Print("Correcting ", files[i], "...")
 			lic = lics["c-like"]
 		}
 		changed, err := correct(files[i], lic)
