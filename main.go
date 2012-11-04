@@ -60,7 +60,7 @@ func findSrcFiles(dir string) ([]string, error) {
 				continue
 			}
 			switch v.Name()[pt:] {
-			case ".go", ".c", ".cpp", ".cxx", ".h", ".hpp", ".java":
+			case ".go", ".c", ".cpp", ".cxx", ".h", ".hpp", ".java", ".js":
 				output = append(output, dir+"/"+v.Name())
 			}
 		}
@@ -92,7 +92,7 @@ func main() {
 		switch files[i][pt:] {
 		case ".go":
 			lic = lics["go"]
-		case ".c", ".cpp", ".cxx", ".h", ".hpp", ".java":
+		case ".c", ".cpp", ".cxx", ".h", ".hpp", ".java", ".js":
 			lic = lics["c-like"]
 		}
 		changed, err := correct(files[i], lic)
