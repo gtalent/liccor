@@ -1,5 +1,5 @@
 /*
-   Copyright 2011-2012 gtalent2@gmail.com
+   Copyright 2011-2014 gtalent2@gmail.com
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -27,15 +27,12 @@ func findLicense(dir string) (string, error) {
 		return "", err
 	}
 	for _, v := range d {
-		if v.Name() == ".liccor" || v.Name() == ".copyright" {
+		if v.Name() == ".liccor" {
 			licenseData, err := ioutil.ReadFile(dir + "/" + v.Name())
 			return string(licenseData), err
 		}
 	}
 
-	//in the event that it finds no license in the higher level
-	//directory, the program conveniently and silently crashes
-	//from a stack overflow
 	return findLicense(dir + "./.")
 }
 
@@ -66,44 +63,6 @@ func findSrcFiles(dir string) ([]string, error) {
 		}
 	}
 	return output, err
-}
-
-func main() {
-	licenseData, err := findLicense(".")
-	if err != nil {
-		return
-	}
-	licenseData = licenseData[0 : len(licenseData)-1]
-	lics := make(map[string]string)
-	lics["c-like"] = "/*\n * " + strings.Replace(string(licenseData), "\n", "\n * ", -1) + "\n */\n"
-	lics["go"] = func() string {
-		golic := "/*\n   " + strings.Replace(string(licenseData), "\n", "\n   ", -1) + "\n*/\n"
-		golic = strings.Replace(golic, "\n   \n", "\n\n", -1)
-		return golic
-	}()
-	files, err := findSrcFiles(".")
-	if err != nil {
-		return
-	}
-	for i := 0; i < len(files); i++ {
-		pt := strings.LastIndex(files[i], ".")
-		lic := ""
-		//determine how to format the license
-		switch files[i][pt:] {
-		case ".go":
-			lic = lics["go"]
-		case ".c", ".cpp", ".cxx", ".h", ".hpp", ".java", ".js":
-			lic = lics["c-like"]
-		}
-		changed, err := correct(files[i], lic)
-		if changed {
-			if err != nil {
-				fmt.Println("Correcting", files[i][2:]+"...\tFailure!")
-			} else {
-				fmt.Println("Correcting", files[i][2:]+"...\tSuccess!")
-			}
-		}
-	}
 }
 
 func hasLicense(file string) (bool, int) {
@@ -150,4 +109,45 @@ func correct(path, license string) (bool, error) {
 		return true, err
 	}
 	return false, nil
+}
+
+func main() {
+	licenseData, err := findLicense(".")
+	if err != nil {
+		fmt.Println("No .liccor could be accessed")
+		return
+	}
+	licenseData = licenseData[0 : len(licenseData)-1]
+	lics := make(map[string]string)
+	lics["c-like"] = "/*\n * " + strings.Replace(string(licenseData), "\n", "\n * ", -1) + "\n */\n"
+	lics["go"] = func() string {
+		golic := "/*\n   " + strings.Replace(string(licenseData), "\n", "\n   ", -1) + "\n*/\n"
+		golic = strings.Replace(golic, "\n   \n", "\n\n", -1)
+		return golic
+	}()
+
+	files, err := findSrcFiles(".")
+	if err != nil {
+		return
+	}
+
+	for i := 0; i < len(files); i++ {
+		pt := strings.LastIndex(files[i], ".")
+		lic := ""
+		//determine how to format the license
+		switch files[i][pt:] {
+		case ".go":
+			lic = lics["go"]
+		case ".c", ".cpp", ".cxx", ".h", ".hpp", ".java", ".js":
+			lic = lics["c-like"]
+		}
+		changed, err := correct(files[i], lic)
+		if changed {
+			if err != nil {
+				fmt.Println("Correcting", files[i][2:]+"...\tFailure!")
+			} else {
+				fmt.Println("Correcting", files[i][2:]+"...\tSuccess!")
+			}
+		}
+	}
 }
