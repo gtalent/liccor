@@ -24,11 +24,14 @@ import (
 func findLicense(dir string) (string, error) {
 	d, err := ioutil.ReadDir(dir)
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("Could not find .liccor file")
 	}
 	for _, v := range d {
 		if v.Name() == ".liccor" {
 			licenseData, err := ioutil.ReadFile(dir + "/" + v.Name())
+			if err != nil {
+				err = fmt.Errorf("Could not access .liccor file")
+			}
 			return string(licenseData), err
 		}
 	}
@@ -114,7 +117,7 @@ func correct(path, license string) (bool, error) {
 func main() {
 	licenseData, err := findLicense(".")
 	if err != nil {
-		fmt.Println("No .liccor could be accessed")
+		fmt.Println(err)
 		return
 	}
 	licenseData = licenseData[0 : len(licenseData)-1]
