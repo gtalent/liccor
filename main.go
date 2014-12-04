@@ -22,6 +22,18 @@ import (
 	"flag"
 )
 
+const (
+	DEFAULT_LICENSE_FILE = ".liccor"
+	SUFFIX_GO = ".go"
+	SUFFIX_C = ".c"
+	SUFFIX_CPP = ".cpp"
+	SUFFIX_CXX = ".cxx"
+	SUFFIX_H = ".h"
+	SUFFIX_HPP = ".hpp"
+	SUFFIX_JAVA = ".java"
+	SUFFIX_JS = ".js"
+)
+
 var (
 	flagLicenseFile string
 	flagVerbose bool
@@ -63,12 +75,15 @@ func findSrcFiles(dir string) ([]string, error) {
 	output := make([]string, 0)
 	for _, v := range l {
 		if v.IsDir() {
-			files, err := findSrcFiles(dir + "/" + v.Name())
-			if err != nil {
-				return output, err
-			}
-			for _, v2 := range files {
-				output = append(output, v2)
+			// ignore .git dir
+			if v.Name() != ".git" {
+				files, err := findSrcFiles(dir + "/" + v.Name())
+				if err != nil {
+					return output, err
+				}
+				for _, v2 := range files {
+					output = append(output, v2)
+				}
 			}
 		} else {
 			pt := strings.LastIndex(v.Name(), ".")
