@@ -149,7 +149,9 @@ func correct(path, license string) (bool, error) {
 
 func init() {
 	flag.StringVar(&flagLicenseFile, "license", DEFAULT_LICENSE_FILE, "the name of the license file")
+	flag.StringVar(&flagLicenseFile, "l", DEFAULT_LICENSE_FILE, "shortcut for license")
 	flag.BoolVar(&flagVerbose, "verbose", false, "print verbose output")
+	flag.BoolVar(&flagVerbose, "v", false, "shortcut for verbose")
 }
 
 func main() {
