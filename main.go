@@ -19,18 +19,23 @@ import (
 	"fmt"
 	"io/ioutil"
 	"strings"
+	"flag"
 )
 
+var (
+	flagLicenseFile string
+	flagVerbose bool
+)
 func findLicense(dir string) (string, error) {
 	d, err := ioutil.ReadDir(dir)
 	if err != nil {
-		return "", fmt.Errorf("Could not find .liccor file")
+		return "", fmt.Errorf("Could not find " + flagLicenseFile + " file")
 	}
 	for _, v := range d {
-		if v.Name() == ".liccor" {
+		if v.Name() == flagLicenseFile {
 			licenseData, err := ioutil.ReadFile(dir + "/" + v.Name())
 			if err != nil {
-				err = fmt.Errorf("Could not access .liccor file")
+				err = fmt.Errorf("Could not access " + flagLicenseFile + " file")
 			}
 			return string(licenseData), err
 		}
@@ -114,7 +119,14 @@ func correct(path, license string) (bool, error) {
 	return false, nil
 }
 
+func init() {
+	flag.StringVar(&flagLicenseFile, "license", DEFAULT_LICENSE_FILE, "the name of the license file")
+	flag.BoolVar(&flagVerbose, "verbose", false, "print verbose output")
+}
+
 func main() {
+	flag.Parse()
+	
 	licenseData, err := findLicense(".")
 	if err != nil {
 		fmt.Println(err)
