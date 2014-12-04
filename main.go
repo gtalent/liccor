@@ -26,7 +26,16 @@ var (
 	flagLicenseFile string
 	flagVerbose bool
 )
+
+func verboseLog(msg string) {
+	if flagVerbose {
+		fmt.Println(msg);
+	}
+}
+
 func findLicense(dir string) (string, error) {
+	verboseLog("Search for '" + flagLicenseFile + "' file at directory '" + dir + "'")
+	
 	d, err := ioutil.ReadDir(dir)
 	if err != nil {
 		return "", fmt.Errorf("Could not find " + flagLicenseFile + " file")
@@ -45,6 +54,8 @@ func findLicense(dir string) (string, error) {
 }
 
 func findSrcFiles(dir string) ([]string, error) {
+	verboseLog("Search source files at '" + dir + "'")
+	
 	l, err := ioutil.ReadDir(dir)
 	if err != nil {
 		return nil, err
