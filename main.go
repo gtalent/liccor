@@ -18,6 +18,7 @@ package main
 import (
 	"fmt"
 	"io/ioutil"
+	"os"
 	"strings"
 	"flag"
 )
@@ -152,6 +153,15 @@ func init() {
 	flag.StringVar(&flagLicenseFile, "l", DEFAULT_LICENSE_FILE, "shortcut for license")
 	flag.BoolVar(&flagVerbose, "verbose", false, "print verbose output")
 	flag.BoolVar(&flagVerbose, "v", false, "shortcut for verbose")
+	flag.Usage = func() {
+		fmt.Print("\n")
+		fmt.Fprintf(os.Stderr, "Usage of %s:\n", os.Args[0])
+		fmt.Println("\nOptions:")
+		flag.PrintDefaults()
+		fmt.Println("\nExample usage:")
+		fmt.Println("  ./liccor -verbose")
+		fmt.Print("\n\n")
+	}
 }
 
 func main() {
