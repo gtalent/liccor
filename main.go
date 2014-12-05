@@ -16,32 +16,32 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"io/ioutil"
 	"strings"
-	"flag"
 )
 
 const (
 	DEFAULT_LICENSE_FILE = ".liccor"
-	SUFFIX_GO = ".go"
-	SUFFIX_C = ".c"
-	SUFFIX_CPP = ".cpp"
-	SUFFIX_CXX = ".cxx"
-	SUFFIX_H = ".h"
-	SUFFIX_HPP = ".hpp"
-	SUFFIX_JAVA = ".java"
-	SUFFIX_JS = ".js"
+	SUFFIX_GO            = ".go"
+	SUFFIX_C             = ".c"
+	SUFFIX_CPP           = ".cpp"
+	SUFFIX_CXX           = ".cxx"
+	SUFFIX_H             = ".h"
+	SUFFIX_HPP           = ".hpp"
+	SUFFIX_JAVA          = ".java"
+	SUFFIX_JS            = ".js"
 )
 
 var (
 	flagLicenseFile string
-	flagVerbose bool
+	flagVerbose     bool
 )
 
 func verboseLog(msg string) {
 	if flagVerbose {
-		fmt.Println(msg);
+		fmt.Println(msg)
 	}
 }
 
@@ -92,9 +92,9 @@ func findSrcFiles(dir string) ([]string, error) {
 			}
 			switch v.Name()[pt:] {
 			case SUFFIX_GO, SUFFIX_C, SUFFIX_CPP, SUFFIX_CXX, SUFFIX_H, SUFFIX_HPP, SUFFIX_JAVA, SUFFIX_JS:
-				srcPath := dir+"/"+v.Name()
+				srcPath := dir + "/" + v.Name()
 				output = append(output, srcPath)
-				verboseLog("Found source '" + srcPath + "'");
+				verboseLog("Found source '" + srcPath + "'")
 			}
 		}
 	}
@@ -189,12 +189,12 @@ func main() {
 		changed, err := correct(files[i], lic)
 		if changed {
 			if err != nil {
-				fmt.Println("Correcting '" + files[i][2:]+"'... Failure!")
+				fmt.Println("Correcting '" + files[i][2:] + "'... Failure!")
 			} else {
-				fmt.Println("Correcting '" + files[i][2:]+"'... Success!")
+				fmt.Println("Correcting '" + files[i][2:] + "'... Success!")
 			}
 		} else {
-			fmt.Println("All files up to date!");
+			fmt.Println("All files up to date!")
 		}
 	}
 }
