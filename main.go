@@ -19,18 +19,44 @@ import (
 	"fmt"
 	"io/ioutil"
 	"strings"
+	"flag"
 )
 
+const (
+	DEFAULT_LICENSE_FILE = ".liccor"
+	SUFFIX_GO = ".go"
+	SUFFIX_C = ".c"
+	SUFFIX_CPP = ".cpp"
+	SUFFIX_CXX = ".cxx"
+	SUFFIX_H = ".h"
+	SUFFIX_HPP = ".hpp"
+	SUFFIX_JAVA = ".java"
+	SUFFIX_JS = ".js"
+)
+
+var (
+	flagLicenseFile string
+	flagVerbose bool
+)
+
+func verboseLog(msg string) {
+	if flagVerbose {
+		fmt.Println(msg);
+	}
+}
+
 func findLicense(dir string) (string, error) {
+	verboseLog("Search for '" + flagLicenseFile + "' file at directory '" + dir + "'")
+
 	d, err := ioutil.ReadDir(dir)
 	if err != nil {
-		return "", fmt.Errorf("Could not find .liccor file")
+		return "", fmt.Errorf("Could not find " + flagLicenseFile + " file")
 	}
 	for _, v := range d {
-		if v.Name() == ".liccor" {
+		if v.Name() == flagLicenseFile {
 			licenseData, err := ioutil.ReadFile(dir + "/" + v.Name())
 			if err != nil {
-				err = fmt.Errorf("Could not access .liccor file")
+				err = fmt.Errorf("Could not access " + flagLicenseFile + " file")
 			}
 			return string(licenseData), err
 		}
@@ -40,6 +66,8 @@ func findLicense(dir string) (string, error) {
 }
 
 func findSrcFiles(dir string) ([]string, error) {
+	verboseLog("Search source files at '" + dir + "'")
+
 	l, err := ioutil.ReadDir(dir)
 	if err != nil {
 		return nil, err
@@ -47,12 +75,15 @@ func findSrcFiles(dir string) ([]string, error) {
 	output := make([]string, 0)
 	for _, v := range l {
 		if v.IsDir() {
-			files, err := findSrcFiles(dir + "/" + v.Name())
-			if err != nil {
-				return output, err
-			}
-			for _, v2 := range files {
-				output = append(output, v2)
+			// ignore .git dir
+			if v.Name() != ".git" {
+				files, err := findSrcFiles(dir + "/" + v.Name())
+				if err != nil {
+					return output, err
+				}
+				for _, v2 := range files {
+					output = append(output, v2)
+				}
 			}
 		} else {
 			pt := strings.LastIndex(v.Name(), ".")
@@ -60,8 +91,10 @@ func findSrcFiles(dir string) ([]string, error) {
 				continue
 			}
 			switch v.Name()[pt:] {
-			case ".go", ".c", ".cpp", ".cxx", ".h", ".hpp", ".java", ".js":
-				output = append(output, dir+"/"+v.Name())
+			case SUFFIX_GO, SUFFIX_C, SUFFIX_CPP, SUFFIX_CXX, SUFFIX_H, SUFFIX_HPP, SUFFIX_JAVA, SUFFIX_JS:
+				srcPath := dir+"/"+v.Name()
+				output = append(output, srcPath)
+				verboseLog("Found source '" + srcPath + "'");
 			}
 		}
 	}
@@ -114,7 +147,16 @@ func correct(path, license string) (bool, error) {
 	return false, nil
 }
 
+func init() {
+	flag.StringVar(&flagLicenseFile, "license", DEFAULT_LICENSE_FILE, "the name of the license file")
+	flag.StringVar(&flagLicenseFile, "l", DEFAULT_LICENSE_FILE, "shortcut for license")
+	flag.BoolVar(&flagVerbose, "verbose", false, "print verbose output")
+	flag.BoolVar(&flagVerbose, "v", false, "shortcut for verbose")
+}
+
 func main() {
+	flag.Parse()
+
 	licenseData, err := findLicense(".")
 	if err != nil {
 		fmt.Println(err)
@@ -139,18 +181,20 @@ func main() {
 		lic := ""
 		//determine how to format the license
 		switch files[i][pt:] {
-		case ".go":
+		case SUFFIX_GO:
 			lic = lics["go"]
-		case ".c", ".cpp", ".cxx", ".h", ".hpp", ".java", ".js":
+		case SUFFIX_C, SUFFIX_CPP, SUFFIX_CXX, SUFFIX_H, SUFFIX_HPP, SUFFIX_JAVA, SUFFIX_JS:
 			lic = lics["c-like"]
 		}
 		changed, err := correct(files[i], lic)
 		if changed {
 			if err != nil {
-				fmt.Println("Correcting", files[i][2:]+"...\tFailure!")
+				fmt.Println("Correcting '" + files[i][2:]+"'... Failure!")
 			} else {
-				fmt.Println("Correcting", files[i][2:]+"...\tSuccess!")
+				fmt.Println("Correcting '" + files[i][2:]+"'... Success!")
 			}
+		} else {
+			fmt.Println("All files up to date!");
 		}
 	}
 }
