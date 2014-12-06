@@ -25,15 +25,16 @@ import (
 
 const (
 	DEFAULT_LICENSE_FILE = ".liccor"
-	SUFFIX_GO            = ".go"
-	SUFFIX_C             = ".c"
-	SUFFIX_CPP           = ".cpp"
-	SUFFIX_CXX           = ".cxx"
-	SUFFIX_H             = ".h"
-	SUFFIX_HPP           = ".hpp"
-	SUFFIX_JAVA          = ".java"
-	SUFFIX_JS            = ".js"
 	VERSION              = "liccor 1.5 (go1)"
+	// list of file extensions
+	SUFFIX_GO   = ".go"
+	SUFFIX_C    = ".c"
+	SUFFIX_CPP  = ".cpp"
+	SUFFIX_CXX  = ".cxx"
+	SUFFIX_H    = ".h"
+	SUFFIX_HPP  = ".hpp"
+	SUFFIX_JAVA = ".java"
+	SUFFIX_JS   = ".js"
 )
 
 var (
@@ -163,6 +164,15 @@ func init() {
 	flag.BoolVar(&flagVerbose, "verbose", false, "print verbose output")
 	flag.BoolVar(&flagVerbose, "v", false, "shortcut for verbose")
 	flag.BoolVar(&showVersion, "version", false, "version of liccor")
+	flag.Usage = func() {
+		fmt.Print("\n")
+		fmt.Fprintf(os.Stderr, "Usage of %s:\n", os.Args[0])
+		fmt.Println("\nOptions:")
+		flag.PrintDefaults()
+		fmt.Println("\nExample usage:")
+		fmt.Println("  ./liccor -verbose")
+		fmt.Print("\n\n")
+	}
 }
 
 func main() {
