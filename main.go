@@ -25,6 +25,7 @@ import (
 
 const (
 	DEFAULT_LICENSE_FILE = ".liccor"
+	VERSION              = "liccor 1.5 (go1)"
 	// list of file extensions
 	SUFFIX_GO   = ".go"
 	SUFFIX_C    = ".c"
@@ -39,6 +40,7 @@ const (
 var (
 	flagLicenseFile string
 	flagVerbose     bool
+	showVersion     bool
 )
 
 func verboseLog(msg string) {
@@ -149,11 +151,19 @@ func correct(path, license string) (bool, error) {
 	return false, nil
 }
 
+func version() {
+	if showVersion {
+		println(VERSION)
+		os.Exit(0)
+	}
+}
+
 func init() {
 	flag.StringVar(&flagLicenseFile, "license", DEFAULT_LICENSE_FILE, "the name of the license file")
 	flag.StringVar(&flagLicenseFile, "l", DEFAULT_LICENSE_FILE, "shortcut for license")
 	flag.BoolVar(&flagVerbose, "verbose", false, "print verbose output")
 	flag.BoolVar(&flagVerbose, "v", false, "shortcut for verbose")
+	flag.BoolVar(&showVersion, "version", false, "version of liccor")
 	flag.Usage = func() {
 		fmt.Print("\n")
 		fmt.Fprintf(os.Stderr, "Usage of %s:\n", os.Args[0])
@@ -167,6 +177,7 @@ func init() {
 
 func main() {
 	flag.Parse()
+	version()
 
 	licenseData, err := findLicense(".")
 	if err != nil {
