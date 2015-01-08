@@ -25,7 +25,7 @@ import (
 
 const (
 	DEFAULT_LICENSE_FILE = ".liccor"
-	VERSION              = "liccor 1.7 (go1)"
+	VERSION              = "liccor 1.8 (go1)"
 	// list of file extensions
 	SUFFIX_GO   = ".go"
 	SUFFIX_C    = ".c"
@@ -50,18 +50,21 @@ func verboseLog(msg string) {
 }
 
 func findLicense(dir string) (string, error) {
-	verboseLog("Search for '" + flagLicenseFile + "' file at directory '" + dir + "'")
+	verboseLog("Search for a license file at directory '" + dir + "'")
 
 	d, err := ioutil.ReadDir(dir)
 	if err != nil {
-		return "", fmt.Errorf("Could not find " + flagLicenseFile + " file")
+		return "", fmt.Errorf("Could not find license file")
 	}
 	for _, v := range d {
-		if v.Name() == flagLicenseFile {
+		filename := v.Name()
+		// search the license file
+		if filename == flagLicenseFile || filename == DEFAULT_LICENSE_FILE || filename == "LICENSE" || filename == "LICENSE.txt" {
 			licenseData, err := ioutil.ReadFile(dir + "/" + v.Name())
 			if err != nil {
-				err = fmt.Errorf("Could not access " + flagLicenseFile + " file")
+				err = fmt.Errorf("Could not access " + filename + " file")
 			}
+			verboseLog("License file '" + filename + "' found...")
 			return string(licenseData), err
 		}
 	}
