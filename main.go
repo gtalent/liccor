@@ -25,7 +25,7 @@ import (
 
 const (
 	DEFAULT_LICENSE_FILE = ".liccor"
-	VERSION              = "liccor 1.5 (go1)"
+	VERSION              = "liccor 1.7 (go1)"
 	// list of file extensions
 	SUFFIX_GO   = ".go"
 	SUFFIX_C    = ".c"
@@ -198,6 +198,7 @@ func main() {
 		return
 	}
 
+	allSuccess := true
 	for i := 0; i < len(files); i++ {
 		pt := strings.LastIndex(files[i], ".")
 		lic := ""
@@ -212,11 +213,13 @@ func main() {
 		if changed {
 			if err != nil {
 				fmt.Println("Correcting '" + files[i][2:] + "'... Failure!")
+				allSuccess = false
 			} else {
 				fmt.Println("Correcting '" + files[i][2:] + "'... Success!")
 			}
-		} else {
-			fmt.Println("All files up to date!")
 		}
+	}
+	if allSuccess {
+		fmt.Println("All files up to date!")
 	}
 }
