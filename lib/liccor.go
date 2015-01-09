@@ -18,14 +18,13 @@ package lib
 
 import (
 	"fmt"
-	"github.com/paulvollmer/liccor/log"
 	"io/ioutil"
 	"strings"
 )
 
 type Liccor struct {
-	Name   string
-	Logger log.Log
+	Name string
+	Log  Logger
 }
 
 const (
@@ -33,7 +32,7 @@ const (
 )
 
 func (l *Liccor) FindLicense(dir, licenseFile string) (string, error) {
-	l.Logger.Verbose("Search for a license file at directory '" + dir + "'")
+	l.Log.Verbose("Search for a license file at directory '" + dir + "'")
 
 	d, err := ioutil.ReadDir(dir)
 	if err != nil {
@@ -47,7 +46,7 @@ func (l *Liccor) FindLicense(dir, licenseFile string) (string, error) {
 			if err != nil {
 				err = fmt.Errorf("Could not access " + filename + " file")
 			}
-			l.Logger.Verbose("License file '" + filename + "' found...")
+			l.Log.Verbose("License file '" + filename + "' found...")
 			return string(licenseData), err
 		}
 	}
@@ -56,7 +55,7 @@ func (l *Liccor) FindLicense(dir, licenseFile string) (string, error) {
 }
 
 func (l *Liccor) FindSrcFiles(dir string) ([]string, error) {
-	l.Logger.Verbose("Search source files at '" + dir + "'")
+	l.Log.Verbose("Search source files at '" + dir + "'")
 
 	d, err := ioutil.ReadDir(dir)
 	if err != nil {
@@ -84,7 +83,7 @@ func (l *Liccor) FindSrcFiles(dir string) ([]string, error) {
 			case SUFFIX_GO, SUFFIX_C, SUFFIX_CPP, SUFFIX_CXX, SUFFIX_H, SUFFIX_HPP, SUFFIX_JAVA, SUFFIX_JS:
 				srcPath := dir + "/" + v.Name()
 				output = append(output, srcPath)
-				l.Logger.Verbose("Found source '" + srcPath + "'")
+				l.Log.Verbose("Found source '" + srcPath + "'")
 			}
 		}
 	}

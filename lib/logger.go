@@ -14,15 +14,15 @@
    limitations under the License.
 */
 
-package log
+package lib
 
 import "fmt"
 
-type Log struct {
+type Logger struct {
 	IsVerbose bool
 }
 
-func (v *Log) Verbose(msg ...interface{}) {
+func (v *Logger) Verbose(msg ...interface{}) {
 	if v.IsVerbose {
 		fmt.Println(msg...)
 	}
