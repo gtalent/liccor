@@ -19,7 +19,6 @@ package lib
 import (
 	"fmt"
 	"github.com/paulvollmer/liccor/log"
-	"github.com/paulvollmer/liccor/suffix"
 	"io/ioutil"
 	"strings"
 )
@@ -82,7 +81,7 @@ func (l *Liccor) FindSrcFiles(dir string) ([]string, error) {
 				continue
 			}
 			switch v.Name()[pt:] {
-			case suffix.GO, suffix.C, suffix.CPP, suffix.CXX, suffix.H, suffix.HPP, suffix.JAVA, suffix.JS:
+			case SUFFIX_GO, SUFFIX_C, SUFFIX_CPP, SUFFIX_CXX, SUFFIX_H, SUFFIX_HPP, SUFFIX_JAVA, SUFFIX_JS:
 				srcPath := dir + "/" + v.Name()
 				output = append(output, srcPath)
 				l.Logger.Verbose("Found source '" + srcPath + "'")
@@ -164,9 +163,9 @@ func (l *Liccor) Process(licenseFile string) {
 		lic := ""
 		//determine how to format the license
 		switch files[i][pt:] {
-		case suffix.GO:
+		case SUFFIX_GO:
 			lic = lics["go"]
-		case suffix.C, suffix.CPP, suffix.CXX, suffix.H, suffix.HPP, suffix.JAVA, suffix.JS:
+		case SUFFIX_C, SUFFIX_CPP, SUFFIX_CXX, SUFFIX_H, SUFFIX_HPP, SUFFIX_JAVA, SUFFIX_JS:
 			lic = lics["c-like"]
 		}
 		changed, err := l.Correct(files[i], lic)
