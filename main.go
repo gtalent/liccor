@@ -36,6 +36,16 @@ func main() {
 			Value: lib.DEFAULT_LICENSE_FILE,
 			Usage: "the name of the license file",
 		},
+		cli.StringFlag{
+			Name:  "before, b",
+			Value: "",
+			Usage: "the string before the license",
+		},
+		cli.StringFlag{
+			Name:  "after, a",
+			Value: "",
+			Usage: "the string after the license",
+		},
 		cli.BoolFlag{
 			Name:  "verbose, V",
 			Usage: "print verbose output",
@@ -45,8 +55,8 @@ func main() {
 		liccor := lib.Liccor{}
 		liccor.Log.IsVerbose = c.Bool("verbose")
 		liccor.License = c.String("license")
-		liccor.Before = c.String("before")
-		liccor.After = c.String("after")
+		liccor.LicenseBeforeText = c.String("before")
+		liccor.LicenseAfterText = c.String("after")
 		liccor.Process()
 	}
 	app.Run(os.Args)

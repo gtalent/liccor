@@ -23,8 +23,10 @@ import (
 )
 
 type Liccor struct {
-	Log     Logger
-	License string
+	Log               Logger
+	License           string
+	LicenseBeforeText string
+	LicenseAfterText  string
 }
 
 const (
@@ -143,6 +145,16 @@ func (l *Liccor) Process() {
 		return
 	}
 	licenseData = licenseData[0 : len(licenseData)-1]
+	if l.LicenseBeforeText != "" {
+		l.Log.Verbose("License before text set to '" + l.LicenseBeforeText + "'")
+		licenseData = l.LicenseBeforeText + "\n" + licenseData
+	}
+	if l.LicenseAfterText != "" {
+		l.Log.Verbose("License after text set to '" + l.LicenseAfterText + "'")
+		licenseData = licenseData + "\n" + l.LicenseAfterText
+	}
+	//fmt.Println("License", licenseData)
+
 	lics := make(map[string]string)
 	lics["c-like"] = "/*\n * " + strings.Replace(string(licenseData), "\n", "\n * ", -1) + "\n */\n"
 	lics["go"] = func() string {
