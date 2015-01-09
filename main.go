@@ -16,8 +16,8 @@
 package main
 
 import (
-	"flag"
 	"fmt"
+	"github.com/codegangsta/cli"
 	"io/ioutil"
 	"os"
 	"strings"
@@ -38,13 +38,12 @@ const (
 )
 
 var (
-	flagLicenseFile string
-	flagVerbose     bool
-	showVersion     bool
+	cliLicense string
+	cliVerbose bool
 )
 
 func verboseLog(msg string) {
-	if flagVerbose {
+	if cliVerbose {
 		fmt.Println(msg)
 	}
 }
@@ -59,7 +58,7 @@ func findLicense(dir string) (string, error) {
 	for _, v := range d {
 		filename := v.Name()
 		// search the license file
-		if filename == flagLicenseFile || filename == DEFAULT_LICENSE_FILE || filename == "LICENSE" || filename == "LICENSE.txt" {
+		if filename == cliLicense || filename == DEFAULT_LICENSE_FILE || filename == "LICENSE" || filename == "LICENSE.txt" {
 			licenseData, err := ioutil.ReadFile(dir + "/" + v.Name())
 			if err != nil {
 				err = fmt.Errorf("Could not access " + filename + " file")
@@ -154,34 +153,32 @@ func correct(path, license string) (bool, error) {
 	return false, nil
 }
 
-func version() {
-	if showVersion {
-		println(VERSION)
-		os.Exit(0)
-	}
-}
-
 func init() {
-	flag.StringVar(&flagLicenseFile, "license", DEFAULT_LICENSE_FILE, "the name of the license file")
-	flag.StringVar(&flagLicenseFile, "l", DEFAULT_LICENSE_FILE, "shortcut for license")
-	flag.BoolVar(&flagVerbose, "verbose", false, "print verbose output")
-	flag.BoolVar(&flagVerbose, "v", false, "shortcut for verbose")
-	flag.BoolVar(&showVersion, "version", false, "version of liccor")
-	flag.Usage = func() {
-		fmt.Print("\n")
-		fmt.Fprintf(os.Stderr, "Usage of %s:\n", os.Args[0])
-		fmt.Println("\nOptions:")
-		flag.PrintDefaults()
-		fmt.Println("\nExample usage:")
-		fmt.Println("  ./liccor -verbose")
-		fmt.Print("\n\n")
+	app := cli.NewApp()
+	app.Name = "liccor"
+	app.Version = "1.8.0"
+	app.Usage = "A license notice corrector for C/C++, Java, JavaScript, and Go."
+	app.Flags = []cli.Flag{
+		cli.StringFlag{
+			Name:  "license, l",
+			Value: ".liccor",
+			Usage: "the name of the license file",
+		},
+		cli.BoolFlag{
+			Name:  "verbose, V",
+			Usage: "print verbose output",
+		},
 	}
+	app.Action = func(c *cli.Context) {
+		cliLicense = c.String("license")
+		cliVerbose = c.Bool("verbose")
+		println("cliLicense", cliLicense)
+		println("cliVerbose", cliVerbose)
+	}
+	app.Run(os.Args)
 }
 
 func main() {
-	flag.Parse()
-	version()
-
 	licenseData, err := findLicense(".")
 	if err != nil {
 		fmt.Println(err)
