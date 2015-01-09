@@ -14,16 +14,16 @@
    limitations under the License.
 */
 
-package suffix
+package lib
 
 // the supported file extensions
 const (
-	GO   = ".go"
-	C    = ".c"
-	CPP  = ".cpp"
-	CXX  = ".cxx"
-	H    = ".h"
-	HPP  = ".hpp"
-	JAVA = ".java"
-	JS   = ".js"
+	SUFFIX_GO   = ".go"
+	SUFFIX_C    = ".c"
+	SUFFIX_CPP  = ".cpp"
+	SUFFIX_CXX  = ".cxx"
+	SUFFIX_H    = ".h"
+	SUFFIX_HPP  = ".hpp"
+	SUFFIX_JAVA = ".java"
+	SUFFIX_JS   = ".js"
 )
