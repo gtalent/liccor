@@ -27,6 +27,8 @@ func main() {
 	app := cli.NewApp()
 	app.Name = "liccor"
 	app.Version = version.VERSION
+	app.Author = "the liccor contributors"
+	app.Email = "https://github.com/gtalent/liccor"
 	app.Usage = "A license notice corrector for C/C++, Java, JavaScript, and Go."
 	app.Flags = []cli.Flag{
 		cli.StringFlag{
