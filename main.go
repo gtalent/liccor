@@ -19,6 +19,7 @@ package main
 import (
 	"fmt"
 	"github.com/codegangsta/cli"
+	"github.com/paulvollmer/liccor/suffix"
 	"github.com/paulvollmer/liccor/version"
 	"io/ioutil"
 	"os"
@@ -27,15 +28,6 @@ import (
 
 const (
 	DEFAULT_LICENSE_FILE = ".liccor"
-	// list of file extensions
-	SUFFIX_GO   = ".go"
-	SUFFIX_C    = ".c"
-	SUFFIX_CPP  = ".cpp"
-	SUFFIX_CXX  = ".cxx"
-	SUFFIX_H    = ".h"
-	SUFFIX_HPP  = ".hpp"
-	SUFFIX_JAVA = ".java"
-	SUFFIX_JS   = ".js"
 )
 
 var (
@@ -98,7 +90,7 @@ func findSrcFiles(dir string) ([]string, error) {
 				continue
 			}
 			switch v.Name()[pt:] {
-			case SUFFIX_GO, SUFFIX_C, SUFFIX_CPP, SUFFIX_CXX, SUFFIX_H, SUFFIX_HPP, SUFFIX_JAVA, SUFFIX_JS:
+			case suffix.GO, suffix.C, suffix.CPP, suffix.CXX, suffix.H, suffix.HPP, suffix.JAVA, suffix.JS:
 				srcPath := dir + "/" + v.Name()
 				output = append(output, srcPath)
 				verboseLog("Found source '" + srcPath + "'")
@@ -205,9 +197,9 @@ func main() {
 		lic := ""
 		//determine how to format the license
 		switch files[i][pt:] {
-		case SUFFIX_GO:
+		case suffix.GO:
 			lic = lics["go"]
-		case SUFFIX_C, SUFFIX_CPP, SUFFIX_CXX, SUFFIX_H, SUFFIX_HPP, SUFFIX_JAVA, SUFFIX_JS:
+		case suffix.C, suffix.CPP, suffix.CXX, suffix.H, suffix.HPP, suffix.JAVA, suffix.JS:
 			lic = lics["c-like"]
 		}
 		changed, err := correct(files[i], lic)
