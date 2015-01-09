@@ -13,11 +13,13 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 */
+
 package main
 
 import (
 	"fmt"
 	"github.com/codegangsta/cli"
+	"github.com/paulvollmer/liccor/version"
 	"io/ioutil"
 	"os"
 	"strings"
@@ -25,7 +27,6 @@ import (
 
 const (
 	DEFAULT_LICENSE_FILE = ".liccor"
-	VERSION              = "liccor 1.8 (go1)"
 	// list of file extensions
 	SUFFIX_GO   = ".go"
 	SUFFIX_C    = ".c"
@@ -156,7 +157,7 @@ func correct(path, license string) (bool, error) {
 func init() {
 	app := cli.NewApp()
 	app.Name = "liccor"
-	app.Version = "1.8.0"
+	app.Version = version.VERSION
 	app.Usage = "A license notice corrector for C/C++, Java, JavaScript, and Go."
 	app.Flags = []cli.Flag{
 		cli.StringFlag{
