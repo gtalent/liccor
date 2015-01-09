@@ -43,8 +43,11 @@ func main() {
 	}
 	app.Action = func(c *cli.Context) {
 		liccor := lib.Liccor{}
-		liccor.Process(c.String("license"))
 		liccor.Log.IsVerbose = c.Bool("verbose")
+		liccor.License = c.String("license")
+		liccor.Before = c.String("before")
+		liccor.After = c.String("after")
+		liccor.Process()
 	}
 	app.Run(os.Args)
 }

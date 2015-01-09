@@ -23,8 +23,8 @@ import (
 )
 
 type Liccor struct {
-	Name string
-	Log  Logger
+	Log     Logger
+	License string
 }
 
 const (
@@ -136,8 +136,8 @@ func (l *Liccor) Correct(path, license string) (bool, error) {
 	return false, nil
 }
 
-func (l *Liccor) Process(licenseFile string) {
-	licenseData, err := l.FindLicense(".", licenseFile)
+func (l *Liccor) Process() {
+	licenseData, err := l.FindLicense(".", l.License)
 	if err != nil {
 		fmt.Println(err)
 		return
