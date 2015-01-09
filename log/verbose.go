@@ -23,6 +23,6 @@ type Log struct {
 
 func (v *Log) Verbose(msg ...interface{}) {
 	if v.IsVerbose {
-		fmt.Println(msg)
+		fmt.Println(msg...)
 	}
 }
