@@ -33,7 +33,7 @@ func main() {
 	app.Flags = []cli.Flag{
 		cli.StringFlag{
 			Name:  "license, l",
-			Value: lib.DEFAULT_LICENSE_FILE,
+			Value: lib.DefaultLicenseFile,
 			Usage: "the name of the license file",
 		},
 		cli.StringFlag{

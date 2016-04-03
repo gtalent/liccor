@@ -18,12 +18,12 @@ package lib
 
 // the supported file extensions
 const (
-	SUFFIX_GO   = ".go"
-	SUFFIX_C    = ".c"
-	SUFFIX_CPP  = ".cpp"
-	SUFFIX_CXX  = ".cxx"
-	SUFFIX_H    = ".h"
-	SUFFIX_HPP  = ".hpp"
-	SUFFIX_JAVA = ".java"
-	SUFFIX_JS   = ".js"
+	SuffixGO   = ".go"
+	SuffixC    = ".c"
+	SuffixCPP  = ".cpp"
+	SuffixCXX  = ".cxx"
+	SuffixH    = ".h"
+	SuffixHPP  = ".hpp"
+	SuffixJAVA = ".java"
+	SuffixJS   = ".js"
 )

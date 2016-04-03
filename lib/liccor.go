@@ -22,6 +22,7 @@ import (
 	"strings"
 )
 
+// Liccor the license corrector
 type Liccor struct {
 	Log               Logger
 	License           string
@@ -29,10 +30,10 @@ type Liccor struct {
 	LicenseAfterText  string
 }
 
-const (
-	DEFAULT_LICENSE_FILE = ".liccor"
-)
+// DefaultLicenseFile store the default file to search for
+const DefaultLicenseFile = ".liccor"
 
+// FindLicense search for a license file
 func (l *Liccor) FindLicense(dir, licenseFile string) (string, error) {
 	l.Log.Verbose("Search for a license file at directory '" + dir + "'")
 
@@ -43,7 +44,7 @@ func (l *Liccor) FindLicense(dir, licenseFile string) (string, error) {
 	for _, v := range d {
 		filename := v.Name()
 		// search the license file
-		if filename == licenseFile || filename == DEFAULT_LICENSE_FILE || filename == "LICENSE" || filename == "LICENSE.txt" {
+		if filename == licenseFile || filename == DefaultLicenseFile || filename == "LICENSE" || filename == "LICENSE.txt" {
 			licenseData, err := ioutil.ReadFile(dir + "/" + v.Name())
 			if err != nil {
 				err = fmt.Errorf("Could not access " + filename + " file")
@@ -56,6 +57,7 @@ func (l *Liccor) FindLicense(dir, licenseFile string) (string, error) {
 	return l.FindLicense(dir+"./.", licenseFile)
 }
 
+// FindSrcFiles search for source files
 func (l *Liccor) FindSrcFiles(dir string) ([]string, error) {
 	l.Log.Verbose("Search source files at '" + dir + "'")
 
@@ -82,7 +84,7 @@ func (l *Liccor) FindSrcFiles(dir string) ([]string, error) {
 				continue
 			}
 			switch v.Name()[pt:] {
-			case SUFFIX_GO, SUFFIX_C, SUFFIX_CPP, SUFFIX_CXX, SUFFIX_H, SUFFIX_HPP, SUFFIX_JAVA, SUFFIX_JS:
+			case SuffixGO, SuffixC, SuffixCPP, SuffixCXX, SuffixH, SuffixHPP, SuffixJAVA, SuffixJS:
 				srcPath := dir + "/" + v.Name()
 				output = append(output, srcPath)
 				l.Log.Verbose("Found source '" + srcPath + "'")
@@ -92,6 +94,7 @@ func (l *Liccor) FindSrcFiles(dir string) ([]string, error) {
 	return output, err
 }
 
+// HasLicense check if sourcecode has a license at the top
 func (l *Liccor) HasLicense(file string) (bool, int) {
 	for i, c := range file {
 		switch c {
@@ -109,6 +112,7 @@ func (l *Liccor) HasLicense(file string) (bool, int) {
 	return false, -1
 }
 
+// Correct a source file license
 func (l *Liccor) Correct(path, license string) (bool, error) {
 	input, err := ioutil.ReadFile(path)
 	if err != nil {
@@ -138,6 +142,7 @@ func (l *Liccor) Correct(path, license string) (bool, error) {
 	return false, nil
 }
 
+// Process run the liccor magic
 func (l *Liccor) Process() {
 	licenseData, err := l.FindLicense(".", l.License)
 	if err != nil {
@@ -174,9 +179,9 @@ func (l *Liccor) Process() {
 		lic := ""
 		//determine how to format the license
 		switch files[i][pt:] {
-		case SUFFIX_GO:
+		case SuffixGO:
 			lic = lics["go"]
-		case SUFFIX_C, SUFFIX_CPP, SUFFIX_CXX, SUFFIX_H, SUFFIX_HPP, SUFFIX_JAVA, SUFFIX_JS:
+		case SuffixC, SuffixCPP, SuffixCXX, SuffixH, SuffixHPP, SuffixJAVA, SuffixJS:
 			lic = lics["c-like"]
 		}
 		changed, err := l.Correct(files[i], lic)
