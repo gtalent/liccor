@@ -1,4 +1,14 @@
 language: go
 go: 1.5
-before_install: go get
-script: make
+
+before_install:
+  - mkdir -p $HOME/gopath/src/github.com/gtalent/liccor
+  - rsync -az ${TRAVIS_BUILD_DIR}/ $HOME/gopath/src/github.com/gtalent/liccor/
+  - export TRAVIS_BUILD_DIR=$HOME/gopath/src/github.com/gtalent/liccor
+  - cd $HOME/gopath/src/github.com/gtalent/liccor
+
+install:
+  - go get
+
+script:
+  - make
