@@ -52,8 +52,8 @@ func main() {
 		},
 	}
 	app.Action = func(c *cli.Context) {
-		liccor := lib.Liccor{}
-		liccor.Log.IsVerbose = c.Bool("verbose")
+		liccor := lib.New()
+		liccor.Log.Active = c.Bool("verbose")
 		liccor.License = c.String("license")
 		liccor.LicenseBeforeText = c.String("before")
 		liccor.LicenseAfterText = c.String("after")

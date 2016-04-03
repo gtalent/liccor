@@ -20,22 +20,29 @@ import (
 	"fmt"
 	"io/ioutil"
 	"strings"
+    "github.com/paulvollmer/go-verbose"
+    "os"
 )
 
 // Liccor the license corrector
 type Liccor struct {
-	Log               Logger
+	Log               verbose.Verbose
 	License           string
 	LicenseBeforeText string
 	LicenseAfterText  string
 }
 
+func New() *Liccor {
+    l := Liccor{}
+    l.Log = *verbose.New(os.Stdout, false)
+    return &l
+}
 // DefaultLicenseFile store the default file to search for
 const DefaultLicenseFile = ".liccor"
 
 // FindLicense search for a license file
 func (l *Liccor) FindLicense(dir, licenseFile string) (string, error) {
-	l.Log.Verbose("Search for a license file at directory '" + dir + "'")
+	l.Log.Printf("Search for a license file at directory '%s'\n", dir)
 
 	d, err := ioutil.ReadDir(dir)
 	if err != nil {
@@ -49,7 +56,7 @@ func (l *Liccor) FindLicense(dir, licenseFile string) (string, error) {
 			if err != nil {
 				err = fmt.Errorf("Could not access " + filename + " file")
 			}
-			l.Log.Verbose("License file '" + filename + "' found...")
+			l.Log.Printf("License file '%s' found...\n", filename)
 			return string(licenseData), err
 		}
 	}
@@ -59,7 +66,7 @@ func (l *Liccor) FindLicense(dir, licenseFile string) (string, error) {
 
 // FindSrcFiles search for source files
 func (l *Liccor) FindSrcFiles(dir string) ([]string, error) {
-	l.Log.Verbose("Search source files at '" + dir + "'")
+	l.Log.Printf("Search source files at '%s'\n", dir)
 
 	d, err := ioutil.ReadDir(dir)
 	if err != nil {
@@ -87,7 +94,7 @@ func (l *Liccor) FindSrcFiles(dir string) ([]string, error) {
 			case SuffixGO, SuffixC, SuffixCPP, SuffixCXX, SuffixH, SuffixHPP, SuffixJAVA, SuffixJS:
 				srcPath := dir + "/" + v.Name()
 				output = append(output, srcPath)
-				l.Log.Verbose("Found source '" + srcPath + "'")
+				l.Log.Printf("Found source '%s'\n", srcPath)
 			}
 		}
 	}
@@ -151,11 +158,11 @@ func (l *Liccor) Process() {
 	}
 	licenseData = licenseData[0 : len(licenseData)-1]
 	if l.LicenseBeforeText != "" {
-		l.Log.Verbose("License before text set to '" + l.LicenseBeforeText + "'")
+		l.Log.Printf("License before text set to '%s'\n", l.LicenseBeforeText)
 		licenseData = l.LicenseBeforeText + "\n" + licenseData
 	}
 	if l.LicenseAfterText != "" {
-		l.Log.Verbose("License after text set to '" + l.LicenseAfterText + "'")
+		l.Log.Printf("License after text set to '%s'\n", l.LicenseAfterText)
 		licenseData = licenseData + "\n" + l.LicenseAfterText
 	}
 	//fmt.Println("License", licenseData)
