@@ -18,7 +18,7 @@ package main
 
 import (
 	"github.com/codegangsta/cli"
-	"github.com/paulvollmer/liccor/lib"
+	"github.com/gtalent/liccor/lib"
 	"os"
 )
 
