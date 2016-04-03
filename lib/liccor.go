@@ -24,6 +24,9 @@ import (
     "os"
 )
 
+
+const VERSION = "1.8.0"
+
 // Liccor the license corrector
 type Liccor struct {
 	Log               verbose.Verbose
@@ -37,6 +40,7 @@ func New() *Liccor {
     l.Log = *verbose.New(os.Stdout, false)
     return &l
 }
+
 // DefaultLicenseFile store the default file to search for
 const DefaultLicenseFile = ".liccor"
 
