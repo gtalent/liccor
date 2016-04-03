@@ -14,18 +14,18 @@
    limitations under the License.
 */
 
-package lib
+package liccor
 
 import (
 	"fmt"
+	"github.com/paulvollmer/go-verbose"
 	"io/ioutil"
+	"os"
 	"strings"
-    "github.com/paulvollmer/go-verbose"
-    "os"
 )
 
-
-const VERSION = "1.8.0"
+// Version store the version as string
+const Version = "1.8.0"
 
 // Liccor the license corrector
 type Liccor struct {
@@ -35,10 +35,11 @@ type Liccor struct {
 	LicenseAfterText  string
 }
 
+// New initialize and return a new Liccor instance
 func New() *Liccor {
-    l := Liccor{}
-    l.Log = *verbose.New(os.Stdout, false)
-    return &l
+	l := Liccor{}
+	l.Log = *verbose.New(os.Stdout, false)
+	return &l
 }
 
 // DefaultLicenseFile store the default file to search for

@@ -14,7 +14,7 @@
    limitations under the License.
 */
 
-package lib
+package liccor
 
 // the supported file extensions
 const (

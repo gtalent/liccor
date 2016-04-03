@@ -25,14 +25,14 @@ import (
 func main() {
 	app := cli.NewApp()
 	app.Name = "liccor"
-	app.Version = lib.VERSION
+	app.Version = liccor.Version
 	app.Author = "the liccor contributors"
 	app.Email = "https://github.com/gtalent/liccor"
 	app.Usage = "A license notice corrector for C/C++, Java, JavaScript, and Go."
 	app.Flags = []cli.Flag{
 		cli.StringFlag{
 			Name:  "license, l",
-			Value: lib.DefaultLicenseFile,
+			Value: liccor.DefaultLicenseFile,
 			Usage: "the name of the license file",
 		},
 		cli.StringFlag{
@@ -51,7 +51,7 @@ func main() {
 		},
 	}
 	app.Action = func(c *cli.Context) {
-		liccor := lib.New()
+		liccor := liccor.New()
 		liccor.Log.Active = c.Bool("verbose")
 		liccor.License = c.String("license")
 		liccor.LicenseBeforeText = c.String("before")
