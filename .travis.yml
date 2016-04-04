@@ -1,0 +1,15 @@
+language: go
+go: 1.5
+
+# workarround to successful build a forked version (import path set to the github.com/gtalent/liccor)
+before_install:
+  - mkdir -p $HOME/gopath/src/github.com/gtalent/liccor
+  - rsync -az ${TRAVIS_BUILD_DIR}/ $HOME/gopath/src/github.com/gtalent/liccor/
+  - export TRAVIS_BUILD_DIR=$HOME/gopath/src/github.com/gtalent/liccor
+  - cd $HOME/gopath/src/github.com/gtalent/liccor
+
+install:
+  - go get
+
+script:
+  - make

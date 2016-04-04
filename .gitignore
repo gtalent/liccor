@@ -1,3 +1,4 @@
+*.DS_Store
 liccor
 main
 _go_.*
