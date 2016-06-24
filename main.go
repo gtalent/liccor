@@ -1,5 +1,5 @@
 /*
-   Copyright 2011-2014 gtalent2@gmail.com
+   Copyright 2011-2016 gtalent2@gmail.com
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -51,13 +51,14 @@ func main() {
 			Usage: "print verbose output",
 		},
 	}
-	app.Action = func(c *cli.Context) {
+	app.Action = func(c *cli.Context) error {
 		liccor := lib.Liccor{}
 		liccor.Log.IsVerbose = c.Bool("verbose")
 		liccor.License = c.String("license")
 		liccor.LicenseBeforeText = c.String("before")
 		liccor.LicenseAfterText = c.String("after")
 		liccor.Process()
+		return nil
 	}
 	app.Run(os.Args)
 }
