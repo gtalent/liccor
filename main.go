@@ -20,14 +20,16 @@ import (
 	"os"
 
 	"github.com/codegangsta/cli"
+	"github.com/paulvollmer/liccor/lib"
+	"github.com/paulvollmer/liccor/version"
 )
 
 func main() {
 	app := cli.NewApp()
 	app.Name = "liccor"
-	app.Version = liccor.Version
+	app.Version = version.VERSION
 	app.Author = "the liccor contributors"
-	app.Email = "https://github.com/gtalent/liccor"
+	app.Email = "https://github.com/gtalent/liccor/graphs/contributors"
 	app.Usage = "A license notice corrector for C/C++, Java, JavaScript, and Go."
 	app.Flags = []cli.Flag{
 		cli.StringFlag{
@@ -50,9 +52,9 @@ func main() {
 			Usage: "print verbose output",
 		},
 	}
-	app.Action = func(c *cli.Context) {
+	app.Action = func(c *cli.Context) error {
 		liccor := liccor.New()
-		liccor.Log.IsVerbose = c.Bool("verbose")
+		liccor.Log.Active = c.Bool("verbose")
 		liccor.License = c.String("license")
 		liccor.LicenseBeforeText = c.String("before")
 		liccor.LicenseAfterText = c.String("after")

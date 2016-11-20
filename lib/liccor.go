@@ -18,10 +18,11 @@ package liccor
 
 import (
 	"fmt"
-	"github.com/paulvollmer/go-verbose"
 	"io/ioutil"
 	"os"
 	"strings"
+
+	"github.com/paulvollmer/go-verbose"
 )
 
 // Version store the version as string
@@ -51,7 +52,7 @@ func (l *Liccor) FindLicense(dir, licenseFile string) (string, error) {
 
 	d, err := ioutil.ReadDir(dir)
 	if err != nil {
-		return "", fmt.Errorf("Could not find license file")
+		return "", fmt.Errorf("Could not find license file. %v", err)
 	}
 	for _, v := range d {
 		filename := v.Name()
@@ -77,14 +78,14 @@ func (l *Liccor) FindSrcFiles(dir string) ([]string, error) {
 	if err != nil {
 		return nil, err
 	}
-	output := make([]string, 0)
+	var output []string
 	for _, v := range d {
 		if v.IsDir() {
 			// ignore .git dir
 			if v.Name() != ".git" {
-				files, err := l.FindSrcFiles(dir + "/" + v.Name())
-				if err != nil {
-					return output, err
+				files, err2 := l.FindSrcFiles(dir + "/" + v.Name())
+				if err2 != nil {
+					return output, err2
 				}
 				for _, v2 := range files {
 					output = append(output, v2)
@@ -138,7 +139,7 @@ func (l *Liccor) Correct(path, license string) (bool, error) {
 			if file[i] == '*' && file[i+1] == '/' {
 				i += 2
 				if file[i] == '\n' {
-					i += 1
+					i++
 				}
 				file = file[i:len(file)]
 				break
