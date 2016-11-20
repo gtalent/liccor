@@ -1,5 +1,5 @@
 /*
-   Copyright 2011-2014 gtalent2@gmail.com
+   Copyright 2011-2016 gtalent2@gmail.com
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -17,9 +17,9 @@
 package main
 
 import (
-	"github.com/codegangsta/cli"
-	"github.com/gtalent/liccor/lib"
 	"os"
+
+	"github.com/codegangsta/cli"
 )
 
 func main() {
@@ -52,11 +52,12 @@ func main() {
 	}
 	app.Action = func(c *cli.Context) {
 		liccor := liccor.New()
-		liccor.Log.Active = c.Bool("verbose")
+		liccor.Log.IsVerbose = c.Bool("verbose")
 		liccor.License = c.String("license")
 		liccor.LicenseBeforeText = c.String("before")
 		liccor.LicenseAfterText = c.String("after")
 		liccor.Process()
+		return nil
 	}
 	app.Run(os.Args)
 }

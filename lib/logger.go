@@ -14,16 +14,16 @@
    limitations under the License.
 */
 
-package liccor
+package lib
 
-// the supported file extensions
-const (
-	SuffixGO   = ".go"
-	SuffixC    = ".c"
-	SuffixCPP  = ".cpp"
-	SuffixCXX  = ".cxx"
-	SuffixH    = ".h"
-	SuffixHPP  = ".hpp"
-	SuffixJAVA = ".java"
-	SuffixJS   = ".js"
-)
+import "fmt"
+
+type Logger struct {
+	IsVerbose bool
+}
+
+func (v *Logger) Verbose(msg ...interface{}) {
+	if v.IsVerbose {
+		fmt.Println(msg...)
+	}
+}

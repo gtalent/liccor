@@ -1,5 +1,5 @@
 /*
-   Copyright 2011-2014 gtalent2@gmail.com
+   Copyright 2011-2016 gtalent2@gmail.com
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -173,7 +173,8 @@ func (l *Liccor) Process() {
 	//fmt.Println("License", licenseData)
 
 	lics := make(map[string]string)
-	lics["c-like"] = "/*\n * " + strings.Replace(string(licenseData), "\n", "\n * ", -1) + "\n */\n"
+	clike := "/*\n * " + strings.Replace(string(licenseData), "\n", "\n * ", -1) + "\n */\n"
+	lics["c-like"] = strings.Replace(clike, "\n * \n", "\n *\n", -1)
 	lics["go"] = func() string {
 		golic := "/*\n   " + strings.Replace(string(licenseData), "\n", "\n   ", -1) + "\n*/\n"
 		golic = strings.Replace(golic, "\n   \n", "\n\n", -1)

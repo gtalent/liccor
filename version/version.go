@@ -14,16 +14,6 @@
    limitations under the License.
 */
 
-package liccor
+package version
 
-// the supported file extensions
-const (
-	SuffixGO   = ".go"
-	SuffixC    = ".c"
-	SuffixCPP  = ".cpp"
-	SuffixCXX  = ".cxx"
-	SuffixH    = ".h"
-	SuffixHPP  = ".hpp"
-	SuffixJAVA = ".java"
-	SuffixJS   = ".js"
-)
+const VERSION = "1.8.2"
