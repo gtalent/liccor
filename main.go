@@ -20,14 +20,13 @@ import (
 	"os"
 
 	"github.com/codegangsta/cli"
-	"github.com/paulvollmer/liccor/lib"
-	"github.com/paulvollmer/liccor/version"
+	"github.com/gtalent/liccor/lib"
 )
 
 func main() {
 	app := cli.NewApp()
 	app.Name = "liccor"
-	app.Version = version.VERSION
+	app.Version = liccor.Version
 	app.Author = "the liccor contributors"
 	app.Email = "https://github.com/gtalent/liccor/graphs/contributors"
 	app.Usage = "A license notice corrector for C/C++, Java, JavaScript, and Go."

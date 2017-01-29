@@ -26,7 +26,7 @@ import (
 )
 
 // Version store the version as string
-const Version = "1.8.0"
+const Version = "1.8.2"
 
 // Liccor the license corrector
 type Liccor struct {
