@@ -154,7 +154,6 @@ func (l *Liccor) Process() {
 		l.Log.Verbose("License after text set to '" + l.LicenseAfterText + "'")
 		licenseData = licenseData + "\n" + l.LicenseAfterText
 	}
-	//fmt.Println("License", licenseData)
 
 	lics := make(map[string]string)
 	clike := "/*\n * " + strings.Replace(string(licenseData), "\n", "\n * ", -1) + "\n */\n"
