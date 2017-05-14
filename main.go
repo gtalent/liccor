@@ -1,5 +1,5 @@
 /*
-   Copyright 2011-2016 gtalent2@gmail.com
+   Copyright 2011-2017 gtalent2@gmail.com
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -37,6 +37,11 @@ func main() {
 			Usage: "the name of the license file",
 		},
 		cli.StringFlag{
+			Name:  "src",
+			Value: ".",
+			Usage: "directory containing the source files to update",
+		},
+		cli.StringFlag{
 			Name:  "before, b",
 			Value: "",
 			Usage: "the string before the license",
@@ -55,6 +60,7 @@ func main() {
 		liccor := lib.Liccor{}
 		liccor.Log.IsVerbose = c.Bool("verbose")
 		liccor.License = c.String("license")
+		liccor.Source = c.String("src")
 		liccor.LicenseBeforeText = c.String("before")
 		liccor.LicenseAfterText = c.String("after")
 		liccor.Process()

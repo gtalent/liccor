@@ -1,5 +1,5 @@
 /*
-   Copyright 2011-2016 gtalent2@gmail.com
+   Copyright 2011-2017 gtalent2@gmail.com
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@ import (
 
 type Liccor struct {
 	Log               Logger
+	Source            string
 	License           string
 	LicenseBeforeText string
 	LicenseAfterText  string
@@ -164,7 +165,7 @@ func (l *Liccor) Process() {
 		return golic
 	}()
 
-	files, err := l.FindSrcFiles(".")
+	files, err := l.FindSrcFiles(l.Source)
 	if err != nil {
 		return
 	}
@@ -182,11 +183,17 @@ func (l *Liccor) Process() {
 		}
 		changed, err := l.Correct(files[i], lic)
 		if changed {
+			var file string
+			if files[i][:2] == "./" {
+				file = files[i][2:]
+			} else {
+				file = files[i]
+			}
 			if err != nil {
-				fmt.Println("Correcting '" + files[i][2:] + "'... Failure!")
+				fmt.Println("Correcting '" + file + "'... Failure!")
 				allSuccess = false
 			} else {
-				fmt.Println("Correcting '" + files[i][2:] + "'... Success!")
+				fmt.Println("Correcting '" + file + "'... Success!")
 			}
 		}
 	}
