@@ -14,42 +14,56 @@
    limitations under the License.
 */
 
-package lib
+package liccor
 
 import (
 	"fmt"
 	"io/ioutil"
+	"os"
 	"strings"
+
+	"github.com/paulvollmer/go-verbose"
 )
 
+// Version store the version as string
+const Version = "1.9.0"
+
+// Liccor the license corrector
 type Liccor struct {
-	Log               Logger
+	Log               verbose.Verbose
 	Source            string
 	License           string
 	LicenseBeforeText string
 	LicenseAfterText  string
 }
 
-const (
-	DEFAULT_LICENSE_FILE = ".liccor"
-)
+// New initialize and return a new Liccor instance
+func New() *Liccor {
+	l := Liccor{}
+	l.Log = *verbose.New(os.Stdout, false)
+	return &l
+}
 
+// DefaultLicenseFile store the default file to search for
+const DefaultLicenseFile = ".liccor"
+
+// FindLicense search for a license file
 func (l *Liccor) FindLicense(dir, licenseFile string) (string, error) {
-	l.Log.Verbose("Search for a license file at directory '" + dir + "'")
+	l.Log.Printf("Search for a license file at directory '%s'\n", dir)
 
 	d, err := ioutil.ReadDir(dir)
 	if err != nil {
-		return "", fmt.Errorf("Could not find license file")
+		return "", fmt.Errorf("Could not find license file. %v", err)
 	}
 	for _, v := range d {
 		filename := v.Name()
 		// search the license file
-		if filename == licenseFile || filename == DEFAULT_LICENSE_FILE || filename == "LICENSE" || filename == "LICENSE.txt" {
+		if filename == licenseFile || filename == DefaultLicenseFile || filename == "LICENSE" || filename == "LICENSE.txt" {
 			licenseData, err := ioutil.ReadFile(dir + "/" + v.Name())
 			if err != nil {
 				err = fmt.Errorf("Could not access " + filename + " file")
 			}
-			l.Log.Verbose("License file '" + filename + "' found...")
+			l.Log.Printf("License file '%s' found...\n", filename)
 			return string(licenseData), err
 		}
 	}
@@ -57,21 +71,22 @@ func (l *Liccor) FindLicense(dir, licenseFile string) (string, error) {
 	return l.FindLicense(dir+"./.", licenseFile)
 }
 
+// FindSrcFiles search for source files
 func (l *Liccor) FindSrcFiles(dir string) ([]string, error) {
-	l.Log.Verbose("Search source files at '" + dir + "'")
+	l.Log.Printf("Search source files at '%s'\n", dir)
 
 	d, err := ioutil.ReadDir(dir)
 	if err != nil {
 		return nil, err
 	}
-	output := make([]string, 0)
+	var output []string
 	for _, v := range d {
 		if v.IsDir() {
 			// ignore .git dir
 			if v.Name() != ".git" {
-				files, err := l.FindSrcFiles(dir + "/" + v.Name())
-				if err != nil {
-					return output, err
+				files, err2 := l.FindSrcFiles(dir + "/" + v.Name())
+				if err2 != nil {
+					return output, err2
 				}
 				for _, v2 := range files {
 					output = append(output, v2)
@@ -83,16 +98,17 @@ func (l *Liccor) FindSrcFiles(dir string) ([]string, error) {
 				continue
 			}
 			switch v.Name()[pt:] {
-			case SUFFIX_GO, SUFFIX_C, SUFFIX_CPP, SUFFIX_CXX, SUFFIX_H, SUFFIX_HPP, SUFFIX_JAVA, SUFFIX_JS:
+			case SuffixGO, SuffixC, SuffixCPP, SuffixCXX, SuffixH, SuffixHPP, SuffixJAVA, SuffixJS:
 				srcPath := dir + "/" + v.Name()
 				output = append(output, srcPath)
-				l.Log.Verbose("Found source '" + srcPath + "'")
+				l.Log.Printf("Found source '%s'\n", srcPath)
 			}
 		}
 	}
 	return output, err
 }
 
+// HasLicense check if sourcecode has a license at the top
 func (l *Liccor) HasLicense(file string) (bool, int) {
 	for i, c := range file {
 		switch c {
@@ -110,6 +126,7 @@ func (l *Liccor) HasLicense(file string) (bool, int) {
 	return false, -1
 }
 
+// Correct a source file license
 func (l *Liccor) Correct(path, license string) (bool, error) {
 	input, err := ioutil.ReadFile(path)
 	if err != nil {
@@ -123,7 +140,7 @@ func (l *Liccor) Correct(path, license string) (bool, error) {
 			if file[i] == '*' && file[i+1] == '/' {
 				i += 2
 				if file[i] == '\n' {
-					i += 1
+					i++
 				}
 				file = file[i:len(file)]
 				break
@@ -139,6 +156,7 @@ func (l *Liccor) Correct(path, license string) (bool, error) {
 	return false, nil
 }
 
+// Process run the liccor magic
 func (l *Liccor) Process() {
 	licenseData, err := l.FindLicense(".", l.License)
 	if err != nil {
@@ -147,11 +165,11 @@ func (l *Liccor) Process() {
 	}
 	licenseData = licenseData[0 : len(licenseData)-1]
 	if l.LicenseBeforeText != "" {
-		l.Log.Verbose("License before text set to '" + l.LicenseBeforeText + "'")
+		l.Log.Printf("License before text set to '%s'\n", l.LicenseBeforeText)
 		licenseData = l.LicenseBeforeText + "\n" + licenseData
 	}
 	if l.LicenseAfterText != "" {
-		l.Log.Verbose("License after text set to '" + l.LicenseAfterText + "'")
+		l.Log.Printf("License after text set to '%s'\n", l.LicenseAfterText)
 		licenseData = licenseData + "\n" + l.LicenseAfterText
 	}
 
@@ -175,9 +193,9 @@ func (l *Liccor) Process() {
 		lic := ""
 		//determine how to format the license
 		switch files[i][pt:] {
-		case SUFFIX_GO:
+		case SuffixGO:
 			lic = lics["go"]
-		case SUFFIX_C, SUFFIX_CPP, SUFFIX_CXX, SUFFIX_H, SUFFIX_HPP, SUFFIX_JAVA, SUFFIX_JS:
+		case SuffixC, SuffixCPP, SuffixCXX, SuffixH, SuffixHPP, SuffixJAVA, SuffixJS:
 			lic = lics["c-like"]
 		}
 		changed, err := l.Correct(files[i], lic)

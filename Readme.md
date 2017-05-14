@@ -1,4 +1,4 @@
-# liccor
+# liccor [![Build Status](https://travis-ci.org/gtalent/liccor.svg?branch=master)](https://travis-ci.org/gtalent/liccor)
 A license notice corrector for C/C++, Java, JavaScript, and Go.
 
 

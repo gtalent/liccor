@@ -13,17 +13,15 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 */
+package main
 
-package lib
+import (
+	"os"
+	"testing"
+)
 
-import "fmt"
-
-type Logger struct {
-	IsVerbose bool
-}
-
-func (v *Logger) Verbose(msg ...interface{}) {
-	if v.IsVerbose {
-		fmt.Println(msg...)
-	}
+func Test_Liccor_Version(t *testing.T) {
+	os.Args[0] = "liccor"
+	os.Args[1] = "--version"
+	main()
 }
