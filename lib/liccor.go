@@ -53,6 +53,7 @@ func New() *Liccor {
 	// ignore error, it's ok if there is no gitignore
 	l.ignore, _ = gitignore.NewGitIgnore(".gitignore")
 	l.Log = *verbose.New(os.Stdout, false)
+	l.Source = []string{"."}
 	return &l
 }
 
@@ -96,7 +97,9 @@ func (l *Liccor) LoadConfig(dir, liccorFileName string) error {
 		}
 
 		l.copyrightNotice = lf.CopyrightNotice
-		l.Source = lf.Source
+		if len(l.Source) == 0 {
+			l.Source = lf.Source
+		}
 		if lf.Ignore != "" {
 			l.ignore = gitignore.NewGitIgnoreFromReader("", strings.NewReader(lf.Ignore))
 		}
