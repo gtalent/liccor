@@ -24,55 +24,96 @@ import (
 
 	"github.com/monochromegane/go-gitignore"
 	"github.com/paulvollmer/go-verbose"
+
+	"gopkg.in/yaml.v2"
 )
 
 // Version store the version as string
 const Version = "1.9.0"
 
+type liccorFile struct {
+	Source          []string `yaml:"source"`
+	CopyrightNotice string   `yaml:"copyright_notice"`
+	Ignore          string   `yaml:"ignore"`
+}
+
 // Liccor the license corrector
 type Liccor struct {
-	Log               verbose.Verbose
-	Source            string
-	License           string
-	LicenseBeforeText string
-	LicenseAfterText  string
-	gitIgnore         gitignore.IgnoreMatcher
+	Log              verbose.Verbose
+	Source           []string
+	NoticeBeforeText string
+	NoticeAfterText  string
+	copyrightNotice  string
+	ignore           gitignore.IgnoreMatcher
 }
 
 // New initialize and return a new Liccor instance
 func New() *Liccor {
 	l := Liccor{}
 	// ignore error, it's ok if there is no gitignore
-	l.gitIgnore, _ = gitignore.NewGitIgnore(".gitignore")
+	l.ignore, _ = gitignore.NewGitIgnore(".gitignore")
 	l.Log = *verbose.New(os.Stdout, false)
 	return &l
 }
 
-// DefaultLicenseFile store the default file to search for
-const DefaultLicenseFile = ".liccor"
-
-// FindLicense search for a license file
-func (l *Liccor) FindLicense(dir, licenseFile string) (string, error) {
+// Load liccor file search for a license file
+func (l *Liccor) LoadConfig(dir, liccorFileName string) error {
 	l.Log.Printf("Search for a license file at directory '%s'\n", dir)
 
 	d, err := ioutil.ReadDir(dir)
 	if err != nil {
-		return "", fmt.Errorf("Could not find license file. %v", err)
+		return fmt.Errorf("Could not find license file. %v", err)
 	}
-	for _, v := range d {
-		filename := v.Name()
-		// search the license file
-		if filename == licenseFile || filename == DefaultLicenseFile || filename == "LICENSE" || filename == "LICENSE.txt" {
-			licenseData, err := ioutil.ReadFile(dir + "/" + v.Name())
-			if err != nil {
-				err = fmt.Errorf("Could not access " + filename + " file")
+
+	fileName := ""
+	if liccorFileName == "" { // no specified liccor file, search for default file names
+		for _, v := range d {
+			fileName = v.Name()
+			// search the license file
+			if fileName == ".liccor" || fileName == ".liccor.yml" || fileName == ".liccor.yaml" {
+				println("'" + fileName + "'")
+				break
 			}
-			l.Log.Printf("License file '%s' found...\n", filename)
-			return string(licenseData), err
+		}
+	} else {
+		if _, err := os.Stat(liccorFileName); err == nil {
+			fileName = liccorFileName
 		}
 	}
 
-	return l.FindLicense(dir+"./.", licenseFile)
+	switch {
+	case fileName == "":
+		break
+	case strings.HasSuffix(fileName, ".yaml"), strings.HasSuffix(fileName, ".yml"):
+		var lf liccorFile
+		data, err := ioutil.ReadFile(dir + "/" + fileName)
+		if err != nil {
+			return err
+		}
+
+		err = yaml.Unmarshal(data, &lf)
+		if err != nil {
+			return err
+		}
+
+		l.copyrightNotice = lf.CopyrightNotice
+		l.Source = lf.Source
+		if lf.Ignore != "" {
+			l.ignore = gitignore.NewGitIgnoreFromReader("", strings.NewReader(lf.Ignore))
+		}
+		return err
+	default:
+		copyrightNotice, err := ioutil.ReadFile(dir + "/" + fileName)
+		if err != nil {
+			err = fmt.Errorf("Could not access " + fileName + " file")
+		}
+		l.Log.Printf("License file '%s' found...\n", fileName)
+		l.copyrightNotice = string(copyrightNotice)
+		l.copyrightNotice = l.copyrightNotice[:len(l.copyrightNotice)-1]
+		return err
+	}
+
+	return l.LoadConfig(dir+"./.", liccorFileName)
 }
 
 // FindSrcFiles search for source files
@@ -133,7 +174,7 @@ func (l *Liccor) HasLicense(file string) (bool, int) {
 // Correct a source file license
 func (l *Liccor) Correct(path, license string) (bool, error) {
 	input, err := ioutil.ReadFile(path)
-	if err != nil || (l.gitIgnore != nil && l.gitIgnore.Match(path, false)) {
+	if err != nil || (l.ignore != nil && l.ignore.Match(path, false)) {
 		return false, err
 	}
 	file := string(input)
@@ -162,59 +203,56 @@ func (l *Liccor) Correct(path, license string) (bool, error) {
 
 // Process run the liccor magic
 func (l *Liccor) Process() {
-	licenseData, err := l.FindLicense(".", l.License)
-	if err != nil {
-		fmt.Println(err)
-		return
+	if l.NoticeBeforeText != "" {
+		l.Log.Printf("License before text set to '%s'\n", l.NoticeBeforeText)
+		l.copyrightNotice = l.NoticeBeforeText + "\n" + l.copyrightNotice
 	}
-	licenseData = licenseData[0 : len(licenseData)-1]
-	if l.LicenseBeforeText != "" {
-		l.Log.Printf("License before text set to '%s'\n", l.LicenseBeforeText)
-		licenseData = l.LicenseBeforeText + "\n" + licenseData
-	}
-	if l.LicenseAfterText != "" {
-		l.Log.Printf("License after text set to '%s'\n", l.LicenseAfterText)
-		licenseData = licenseData + "\n" + l.LicenseAfterText
+	if l.NoticeAfterText != "" {
+		l.Log.Printf("License after text set to '%s'\n", l.NoticeAfterText)
+		l.copyrightNotice = l.copyrightNotice + "\n" + l.NoticeAfterText
 	}
 
 	lics := make(map[string]string)
-	clike := "/*\n * " + strings.Replace(string(licenseData), "\n", "\n * ", -1) + "\n */\n"
+	clike := "/*\n * " + strings.Replace(string(l.copyrightNotice), "\n", "\n * ", -1) + "\n */\n"
 	lics["c-like"] = strings.Replace(clike, "\n * \n", "\n *\n", -1)
 	lics["go"] = func() string {
-		golic := "/*\n   " + strings.Replace(string(licenseData), "\n", "\n   ", -1) + "\n*/\n"
+		golic := "/*\n   " + strings.Replace(string(l.copyrightNotice), "\n", "\n   ", -1) + "\n*/\n"
 		golic = strings.Replace(golic, "\n   \n", "\n\n", -1)
 		return golic
 	}()
 
-	files, err := l.FindSrcFiles(l.Source)
-	if err != nil {
-		return
-	}
-
 	allSuccess := true
-	for i := 0; i < len(files); i++ {
-		pt := strings.LastIndex(files[i], ".")
-		lic := ""
-		//determine how to format the license
-		switch files[i][pt:] {
-		case SuffixGO:
-			lic = lics["go"]
-		case SuffixC, SuffixCPP, SuffixCXX, SuffixH, SuffixHPP, SuffixJAVA, SuffixJS:
-			lic = lics["c-like"]
+	for _, source := range l.Source {
+		files, err := l.FindSrcFiles(source)
+		if err != nil {
+			fmt.Errorf("Error encountered while searching "+source+", %v", err)
+			continue
 		}
-		changed, err := l.Correct(files[i], lic)
-		if changed {
-			var file string
-			if files[i][:2] == "./" {
-				file = files[i][2:]
-			} else {
-				file = files[i]
+
+		for i := 0; i < len(files); i++ {
+			pt := strings.LastIndex(files[i], ".")
+			lic := ""
+			//determine how to format the license
+			switch files[i][pt:] {
+			case SuffixGO:
+				lic = lics["go"]
+			case SuffixC, SuffixCPP, SuffixCXX, SuffixH, SuffixHPP, SuffixJAVA, SuffixJS:
+				lic = lics["c-like"]
 			}
-			if err != nil {
-				fmt.Println("Correcting '" + file + "'... Failure!")
-				allSuccess = false
-			} else {
-				fmt.Println("Correcting '" + file + "'... Success!")
+			changed, err := l.Correct(files[i], lic)
+			if changed {
+				var file string
+				if files[i][:2] == "./" {
+					file = files[i][2:]
+				} else {
+					file = files[i]
+				}
+				if err != nil {
+					fmt.Println("Correcting '" + file + "'... Failure!")
+					allSuccess = false
+				} else {
+					fmt.Println("Correcting '" + file + "'... Success!")
+				}
 			}
 		}
 	}

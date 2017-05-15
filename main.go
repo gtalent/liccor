@@ -32,24 +32,22 @@ func main() {
 	app.Usage = "A license notice corrector for C/C++, Java, JavaScript, and Go."
 	app.Flags = []cli.Flag{
 		cli.StringFlag{
-			Name:  "license, l",
-			Value: liccor.DefaultLicenseFile,
-			Usage: "the name of the license file",
+			Name:  "liccorFile, l",
+			Usage: "the name of the liccor file",
 		},
 		cli.StringFlag{
 			Name:  "src",
-			Value: ".",
 			Usage: "directory containing the source files to update",
 		},
 		cli.StringFlag{
 			Name:  "before, b",
 			Value: "",
-			Usage: "the string before the license",
+			Usage: "the string before the copyright notice",
 		},
 		cli.StringFlag{
 			Name:  "after, a",
 			Value: "",
-			Usage: "the string after the license",
+			Usage: "the string after the copyright notice",
 		},
 		cli.BoolFlag{
 			Name:  "verbose, V",
@@ -59,10 +57,12 @@ func main() {
 	app.Action = func(c *cli.Context) error {
 		liccor := liccor.New()
 		liccor.Log.Active = c.Bool("verbose")
-		liccor.License = c.String("license")
-		liccor.Source = c.String("src")
-		liccor.LicenseBeforeText = c.String("before")
-		liccor.LicenseAfterText = c.String("after")
+		liccor.LoadConfig(".", c.String("liccorFile"))
+		if c.String("src") != "" {
+			liccor.Source = []string{c.String("src")}
+		}
+		liccor.NoticeBeforeText = c.String("before")
+		liccor.NoticeAfterText = c.String("after")
 		liccor.Process()
 		return nil
 	}
