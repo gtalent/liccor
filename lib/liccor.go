@@ -22,6 +22,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/monochromegane/go-gitignore"
 	"github.com/paulvollmer/go-verbose"
 )
 
@@ -35,11 +36,14 @@ type Liccor struct {
 	License           string
 	LicenseBeforeText string
 	LicenseAfterText  string
+	gitIgnore         gitignore.IgnoreMatcher
 }
 
 // New initialize and return a new Liccor instance
 func New() *Liccor {
 	l := Liccor{}
+	// ignore error, it's ok if there is no gitignore
+	l.gitIgnore, _ = gitignore.NewGitIgnore(".gitignore")
 	l.Log = *verbose.New(os.Stdout, false)
 	return &l
 }
@@ -129,7 +133,7 @@ func (l *Liccor) HasLicense(file string) (bool, int) {
 // Correct a source file license
 func (l *Liccor) Correct(path, license string) (bool, error) {
 	input, err := ioutil.ReadFile(path)
-	if err != nil {
+	if err != nil || (l.gitIgnore != nil && l.gitIgnore.Match(path, false)) {
 		return false, err
 	}
 	file := string(input)
