@@ -97,9 +97,7 @@ func (l *Liccor) LoadConfig(dir, liccorFileName string) error {
 		}
 
 		l.copyrightNotice = lf.CopyrightNotice
-		if len(l.Source) == 0 {
-			l.Source = lf.Source
-		}
+		l.Source = lf.Source
 		if lf.Ignore != "" {
 			l.ignore = gitignore.NewGitIgnoreFromReader("", strings.NewReader(lf.Ignore))
 		}
