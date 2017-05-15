@@ -5,12 +5,12 @@ test: test-src test-cli
 test-src:
 	@echo "TEST LICCOR SRC"
 	@go test -v -cover lib/*.go
-	@echo "===\n"
+	@echo "==="
 
 test-cli:
 	@echo "TEST LICCOR TOOL"
-	@go test -v -cover
-	@echo "===\n"
+	@go test -v -cover *.go
+	@echo "==="
 
 build:
 	@echo "BUILD LICCOR TOOL"
