@@ -71,7 +71,6 @@ func (l *Liccor) LoadConfig(dir, liccorFileName string) error {
 			fileName = v.Name()
 			// search the license file
 			if fileName == ".liccor" || fileName == ".liccor.yml" || fileName == ".liccor.yaml" {
-				println("'" + fileName + "'")
 				break
 			}
 		}
