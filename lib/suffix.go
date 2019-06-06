@@ -26,4 +26,6 @@ const (
 	SuffixHPP  = ".hpp"
 	SuffixJAVA = ".java"
 	SuffixJS   = ".js"
+	SuffixTS   = ".ts"
+	SuffixTSX  = ".tsx"
 )

@@ -143,7 +143,7 @@ func (l *Liccor) FindSrcFiles(dir string) ([]string, error) {
 				continue
 			}
 			switch v.Name()[pt:] {
-			case SuffixGO, SuffixC, SuffixCPP, SuffixCXX, SuffixH, SuffixHPP, SuffixJAVA, SuffixJS:
+			case SuffixGO, SuffixC, SuffixCPP, SuffixCXX, SuffixH, SuffixHPP, SuffixJAVA, SuffixJS, SuffixTS, SuffixTSX:
 				srcPath := dir + "/" + v.Name()
 				output = append(output, srcPath)
 				l.Log.Printf("Found source '%s'\n", srcPath)
@@ -236,7 +236,7 @@ func (l *Liccor) Process() {
 			switch files[i][pt:] {
 			case SuffixGO:
 				lic = lics["go"]
-			case SuffixC, SuffixCPP, SuffixCXX, SuffixH, SuffixHPP, SuffixJAVA, SuffixJS:
+			case SuffixC, SuffixCPP, SuffixCXX, SuffixH, SuffixHPP, SuffixJAVA, SuffixJS, SuffixTS, SuffixTSX:
 				lic = lics["c-like"]
 			}
 			changed, err := l.Correct(files[i], lic)
