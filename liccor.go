@@ -19,8 +19,8 @@ package main
 import (
 	"os"
 
-	"github.com/codegangsta/cli"
 	"github.com/gtalent/liccor/lib"
+	"github.com/urfave/cli"
 )
 
 func main() {
