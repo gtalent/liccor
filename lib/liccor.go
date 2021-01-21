@@ -1,5 +1,5 @@
 /*
-   Copyright 2011-2017 gtalent2@gmail.com
+   Copyright 2011 - 2021 gary@drinkingtea.net
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -69,16 +69,14 @@ func (l *Liccor) LoadConfig(dir, liccorFileName string) error {
 	fileName := ""
 	if liccorFileName == "" { // no specified liccor file, search for default file names
 		for _, v := range d {
-			fileName = v.Name()
 			// search the license file
 			if fileName == ".liccor" || fileName == ".liccor.yml" || fileName == ".liccor.yaml" {
+				fileName = v.Name()
 				break
 			}
 		}
-	} else {
-		if _, err := os.Stat(liccorFileName); err == nil {
-			fileName = liccorFileName
-		}
+	} else if _, err := os.Stat(liccorFileName); err == nil {
+		fileName = liccorFileName
 	}
 
 	switch {
