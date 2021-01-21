@@ -57,7 +57,10 @@ func main() {
 	app.Action = func(c *cli.Context) error {
 		liccor := liccor.New()
 		liccor.Log.Active = c.Bool("verbose")
-		liccor.LoadConfig(".", c.String("liccorFile"))
+		if err := liccor.LoadConfig(".", c.String("liccorFile")); err != nil {
+			println("Could not load liccor file")
+			return err
+		}
 		if c.String("src") != "" {
 			liccor.Source = []string{c.String("src")}
 		}

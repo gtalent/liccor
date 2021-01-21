@@ -29,7 +29,7 @@ import (
 )
 
 // Version store the version as string
-const Version = "1.9.1"
+const Version = "1.9.2"
 
 type liccorFile struct {
 	Source          []string `yaml:"source"`
@@ -70,7 +70,7 @@ func (l *Liccor) LoadConfig(dir, liccorFileName string) error {
 	if liccorFileName == "" { // no specified liccor file, search for default file names
 		for _, v := range d {
 			// search the license file
-			if fileName == ".liccor" || fileName == ".liccor.yml" || fileName == ".liccor.yaml" {
+			if v.Name() == ".liccor" || v.Name() == ".liccor.yml" || v.Name() == ".liccor.yaml" {
 				fileName = v.Name()
 				break
 			}
