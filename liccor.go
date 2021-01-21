@@ -1,5 +1,5 @@
 /*
-   Copyright 2011-2017 gtalent2@gmail.com
+   Copyright 2011 - 2021 gary@drinkingtea.net
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -19,8 +19,8 @@ package main
 import (
 	"os"
 
-	"github.com/codegangsta/cli"
 	"github.com/gtalent/liccor/lib"
+	"github.com/urfave/cli"
 )
 
 func main() {
