@@ -29,7 +29,7 @@ import (
 )
 
 // Version store the version as string
-const Version = "1.9.0"
+const Version = "1.9.1"
 
 type liccorFile struct {
 	Source          []string `yaml:"source"`
